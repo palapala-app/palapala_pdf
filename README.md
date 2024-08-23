@@ -22,7 +22,7 @@ $ gem install palapala_pdf
 
 To create a PDF from HTML content using the `Palapala` library, follow these steps:
 
-1. **Setup Configuration**:
+1. **Configuration**:
 
 Configure the `Palapala` library with the necessary options, such as the URL for the Ferrum browser and default settings like scale and format.
 
@@ -30,6 +30,7 @@ In a Rails context, this could be inside an initializer.
 
 ```ruby
 Palapala.setup do |config|
+    # run against an external chrome/chromium
     config.ferrum_opts = { url: 'http://localhost:9222' }
     config.defaults = { scale: 1, format: :A4 }
 end
