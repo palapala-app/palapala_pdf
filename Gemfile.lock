@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    html_pdf_chrome (0.1.0)
+    palapala_pdf (0.1.0)
       ferrum
 
 GEM
@@ -62,8 +62,8 @@ PLATFORMS
 
 DEPENDENCIES
   ferrum (~> 0.15)
-  html_pdf_chrome!
   minitest (~> 5.0)
+  palapala_pdf!
   rake (~> 13.0)
   rubocop (~> 1.21)
   rubocop-minitest (~> 0)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'html_pdf_chrome/page'
+require_relative 'palapala_pdf/page'
 
 # Main module for the gem
 module HtmlPdfChrome

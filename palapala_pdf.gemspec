@@ -1,23 +1,23 @@
 # frozen_string_literal: true
 
-require_relative 'lib/html_pdf_chrome/version'
+require_relative 'lib/palapala_pdf/version'
 
 Gem::Specification.new do |spec|
-  spec.name = 'html_pdf_chrome'
+  spec.name = 'palapala_pdf'
   spec.version = HtmlPdfChrome::VERSION
   spec.authors = ['Koen Handekyn']
   spec.email = ['github.com@handekyn.com']
 
   spec.summary = 'Convert HTML into PDF directly from Ruby using Chrome/Chromium.'
   spec.description = 'This gem uses Ferrum to render HTML into a PDF using Chrom(e)(ium) with minimal dependencies.'
-  spec.homepage = 'https://github.com/palapala-app/html_pdf_chrome'
+  spec.homepage = 'https://github.com/palapala-app/palapala_pdf'
   spec.required_ruby_version = '>= 3.1'
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
   spec.metadata['homepage_uri'] = spec.homepage
-  spec.metadata['source_code_uri'] = 'https://github.com/palapala-app/html_pdf_chrome'
-  spec.metadata['changelog_uri'] = 'https://github.com/palapala-app/html_pdf_chrome/blob/main/changelog.md'
+  spec.metadata['source_code_uri'] = 'https://github.com/palapala-app/palapala_pdf'
+  spec.metadata['changelog_uri'] = 'https://github.com/palapala-app/palapala_pdf/blob/main/changelog.md'
   spec.metadata['rubygems_mfa_required'] = 'true'
 
   # Specify which files should be added to the gem when it is released.

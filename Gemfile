@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in html_pdf_chrome.gemspec
+# Specify your gem's dependencies in palapala_pdf.gemspec
 gemspec
 
 gem 'rake', '~> 13.0'

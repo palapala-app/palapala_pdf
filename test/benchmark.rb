@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'benchmark'
-require_relative '../lib/html_pdf_chrome'
+require_relative '../lib/palapala_pdf'
 
 HELLO_WORLD = <<~HTML.freeze
   Hello, world! #{Time.now}.
