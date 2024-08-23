@@ -9,9 +9,11 @@ HTML
 DOCUMENT = HELLO_WORLD * 1
 
 Palapala.setup do |config|
-  config.ferrum_opts = { url: 'http://localhost:9222' }
+  # config.ferrum_opts = { url: 'http://localhost:9222' }
   config.defaults.merge! scale: 0.75, format: :A4
 end
+
+Palapala::Pdf.new(DOCUMENT).save('tmp/benchmark.pdf')
 
 # @param concurrency Number of concurrent threads
 # @param iterations Number of iterations per thread
@@ -30,7 +32,6 @@ def benchmark(concurrency, iterations)
   time
 end
 
-Palapala::Pdf.new(DOCUMENT).save('tmp/benchmark.pdf')
 
 puts 'warmup'
 benchmark(1, 10)

@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     palapala_pdf (0.1.0)
-      ferrum
+      ferrum (~> 0.15)
 
 GEM
   remote: https://rubygems.org/
