@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    palapala_pdf (0.1.0)
+    palapala_pdf (0.1.1)
       ferrum (~> 0.15)
 
 GEM
