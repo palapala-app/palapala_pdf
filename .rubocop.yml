@@ -1,0 +1,14 @@
+inherit_from: .rubocop_todo.yml
+
+# This is a basic RuboCop configuration file
+AllCops:
+  TargetRubyVersion: 3.1
+  NewCops: enable
+  Exclude:
+    - db/schema.rb
+    - bin/**/*
+    - draft/**/*
+
+require:
+  - rubocop-minitest
+  - rubocop-rake
