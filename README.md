@@ -37,17 +37,17 @@ end
 
 2. **Create a PDF from HTML**:
 
-Instantiate a new Palapala::Page object with your HTML content and generate the PDF binary data.
+Instantiate a new Palapala::Pdf object with your HTML content and generate the PDF binary data.
 
 ```ruby
-page = Palapala::Page.new("<h1>Hello, world! #{Time.now}</h1>")
+page = Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>")
 pdf = page.binary_data
 ```
 
 Alternatively, write the pdf straight to a file:
 
 ```ruby
-Palapala::Page.new("<h1>Hello, world! #{Time.now}</h1>").save("hello.pdf")
+Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").save("hello.pdf")
 ```
 
 ## Development
@@ -73,3 +73,20 @@ If you find this project useful and would like to support its development, consi
 - **Buy Me a Coffee:** [Buy a Coffee](https://buymeacoffee.com/koenhandekyn)
 
 Your support is greatly appreciated and helps maintain the project!
+
+## Findings
+
+For chrome, mode headless=new seems to be slower for pdf rendering cases.
+
+## Primitive benchmark
+
+On a macbook m3, the throughput for 'hello world' PDF generation can reach around 25 docs/second when allowing for some concurrency. As Chrome is actually also very efficient, it scales really well for complex documents also. If you run this in Rails, the concurrency is being taken care of either by the front end thread pool or by the workers and you shouldn't have to think about this.
+
+```
+benchmarking 20 docs: 1x20, 2x10, 4x5, 5x4, 20x1 (c is concurrency, n is iterations)
+Total time c:1, n:20 = 1.2048690000083297 seconds
+Total time c:2, n:10 = 0.8969700000016019 seconds
+Total time c:4, n:5 = 0.7497870000079274 seconds
+Total time c:5, n:4 = 0.72492800001055 seconds
+Total time c:20, n:1 = 0.7156629998935387 seconds
+```

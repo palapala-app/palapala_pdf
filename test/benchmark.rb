@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require 'benchmark'
-require_relative '../lib/palapala_pdf'
+require_relative '../lib/palapala'
 
 HELLO_WORLD = <<~HTML.freeze
   Hello, world! #{Time.now}.
 HTML
-DOCUMENT = HELLO_WORLD * 500
+DOCUMENT = HELLO_WORLD * 1
 
 Palapala.setup do |config|
   config.ferrum_opts = { url: 'http://localhost:9222' }
@@ -30,7 +30,7 @@ def benchmark(concurrency, iterations)
   time
 end
 
-Palapala::Page.new(DOCUMENT).save('tmp/benchmark.pdf')
+Palapala::Pdf.new(DOCUMENT).save('tmp/benchmark.pdf')
 
 puts 'warmup'
 benchmark(1, 10)

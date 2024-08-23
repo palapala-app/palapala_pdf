@@ -4,7 +4,7 @@ require 'ferrum'
 
 module Palapala
   # Page class to generate PDF from HTML content using Chrome in headless mode in a thread-safe way
-  class Page
+  class Pdf
     def initialize(content = nil,
                    url: nil,
                    path: nil,

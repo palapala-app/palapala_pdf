@@ -3,12 +3,6 @@
 require_relative 'test_helper'
 require 'benchmark'
 
-# name - palapala_pdf
-# name - palapala_renderer
-# name - palapala_pdf_renderer
-
-# note, mode headless=new seems to be slower for pdf rendering cases
-
 class TestPdf < Minitest::Test
   def setup
     Palapala.setup do |config|

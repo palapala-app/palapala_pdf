@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'lib/palapala_pdf/version'
+require_relative 'lib/palapala/version'
 
 Gem::Specification.new do |spec|
   spec.name = 'palapala_pdf'
