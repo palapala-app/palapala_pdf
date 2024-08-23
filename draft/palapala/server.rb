@@ -3,7 +3,7 @@
 require 'webrick'
 require 'securerandom'
 
-module HtmlPdfChrome
+module Palapala
   class Server
     attr_reader :port
 

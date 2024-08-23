@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'palapala_pdf/page'
+require_relative 'palapala/pdf'
 
 # Main module for the gem
-module HtmlPdfChrome
+module Palapala
   def self.setup
     yield self
   end

@@ -7,7 +7,7 @@ require 'uri'
 class TestBrowser < Minitest::Test
   # # This method will be called before any tests are run
   # def self.startup
-  #   @@server ||= HtmlPdfChrome::Server.instance.start(wait: true)
+  #   @@server ||= Palapala::Server.instance.start(wait: true)
   # end
 
   # # This method will be called after all tests are done
@@ -26,7 +26,7 @@ class TestBrowser < Minitest::Test
   # end
 
   def test_serve_and_remove_file
-    server = HtmlPdfChrome::Server.new(port: 9224).start(wait: true)
+    server = Palapala::Server.new(port: 9224).start(wait: true)
     # Get the server instance
     hello_world = server.add_file('<h1>Hello, world!</h1>')
     url = server.url_for(hello_world)
@@ -46,7 +46,7 @@ class TestBrowser < Minitest::Test
   end
 
   def test_random_key_should_return_404
-    server = HtmlPdfChrome::Server.new(port: 9225).start(wait: true)
+    server = Palapala::Server.new(port: 9225).start(wait: true)
     url = URI.parse("http://localhost:#{server.port}/file/#{SecureRandom.hex}")
     response = Net::HTTP.get_response(url)
     assert_equal '404', response.code

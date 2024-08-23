@@ -20,16 +20,16 @@ $ gem install palapala_pdf
 
 ## Usage Instructions
 
-To create a PDF from HTML content using the `HtmlPdfChrome` library, follow these steps:
+To create a PDF from HTML content using the `Palapala` library, follow these steps:
 
 1. **Setup Configuration**:
 
-Configure the `HtmlPdfChrome` library with the necessary options, such as the URL for the Ferrum browser and default settings like scale and format.
+Configure the `Palapala` library with the necessary options, such as the URL for the Ferrum browser and default settings like scale and format.
 
 In a Rails context, this could be inside an initializer.
 
 ```ruby
-HtmlPdfChrome.setup do |config|
+Palapala.setup do |config|
     config.ferrum_opts = { url: 'http://localhost:9222' }
     config.defaults = { scale: 1, format: :A4 }
 end
@@ -37,17 +37,17 @@ end
 
 2. **Create a PDF from HTML**:
 
-Instantiate a new HtmlPdfChrome::Page object with your HTML content and generate the PDF binary data.
+Instantiate a new Palapala::Page object with your HTML content and generate the PDF binary data.
 
 ```ruby
-page = HtmlPdfChrome::Page.new("<h1>Hello, world! #{Time.now}</h1>")
+page = Palapala::Page.new("<h1>Hello, world! #{Time.now}</h1>")
 pdf = page.binary_data
 ```
 
 Alternatively, write the pdf straight to a file:
 
 ```ruby
-HtmlPdfChrome::Page.new("<h1>Hello, world! #{Time.now}</h1>").save("hello.pdf")
+Palapala::Page.new("<h1>Hello, world! #{Time.now}</h1>").save("hello.pdf")
 ```
 
 ## Development

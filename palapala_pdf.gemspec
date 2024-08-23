@@ -4,7 +4,7 @@ require_relative 'lib/palapala_pdf/version'
 
 Gem::Specification.new do |spec|
   spec.name = 'palapala_pdf'
-  spec.version = HtmlPdfChrome::VERSION
+  spec.version = Palapala::VERSION
   spec.authors = ['Koen Handekyn']
   spec.email = ['github.com@handekyn.com']
 

@@ -2,7 +2,7 @@
 
 require 'ferrum'
 
-module HtmlPdfChrome
+module Palapala
   # Page class to generate PDF from HTML content using Chrome in headless mode in a thread-safe way
   class Page
     def initialize(content = nil,
@@ -12,9 +12,9 @@ module HtmlPdfChrome
                    footer_html: nil,
                    generate_tagged_pdf: false,
                    prefer_css_page_size: true,
-                   scale: HtmlPdfChrome.defaults.fetch(:scale, 1),
-                   page_ranges: HtmlPdfChrome.defaults.fetch(:page_ranges, ''),
-                   margin: HtmlPdfChrome.defaults.fetch(:margin, {}))
+                   scale: Palapala.defaults.fetch(:scale, 1),
+                   page_ranges: Palapala.defaults.fetch(:page_ranges, ''),
+                   margin: Palapala.defaults.fetch(:margin, {}))
       @content = content
       @url = url
       @path = path
@@ -97,7 +97,7 @@ module HtmlPdfChrome
     end
 
     def new_browser
-      Ferrum::Browser.new(HtmlPdfChrome.ferrum_opts)
+      Ferrum::Browser.new(Palapala.ferrum_opts)
     end
 
     # # TODO use method from template class
