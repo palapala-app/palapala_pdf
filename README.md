@@ -60,6 +60,11 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/palapala-app/palapala_pdf.
 
+## Contributors
+
+- [Kenneth Geerts](https://github.com/kennethgeerts) - Your foundational contributions to simplicity are greatly appreciated.
+- [Eugen Neagoe](https://github.com/eneagoe) - Thank you for your valuable input, feedback and opinions.
+
 ## Sponsor This Project
 
 If you find this project useful and would like to support its development, consider sponsoring or buying a coffee to help keep it going:
