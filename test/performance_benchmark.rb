@@ -10,7 +10,7 @@ HTML
 DOCUMENT = HELLO_WORLD * 1
 
 Palapala.setup do |config|
-  # config.ferrum_opts = { url: 'http://localhost:9222' }
+  config.ferrum_opts = { url: 'http://localhost:9222' }
   config.defaults.merge! scale: 0.75, format: :A4
 end
 
