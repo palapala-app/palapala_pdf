@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'ferrum'
 
 module Palapala
@@ -39,70 +37,64 @@ module Palapala
     def pdf(**opts)
       browser_context = browser.contexts.create
       browser_page = browser_context.page
-      # # output console logs for this page
-      if Palapala.debug
-        browser_page.on('Runtime.consoleAPICalled') do |params|
-          params['args'].each { |r| puts(r['value']) }
-        end
-      end
-      # open the page
-      url = @url || data_url
+      debug(browser_page) if Palapala.debug
       browser_page.go_to(url)
-      # Wait for the page to load
-      # browser_page.network.wait_for_idle
-      # Generate PDF
-      pdf_binary_data = browser_page.pdf(**opts_with_defaults.merge(opts))
-      # Dispose the context
+      pdf_binary_data = browser_page.pdf(**merged_opts(opts))
+      opts[:path] || pdf_binary_data
+    ensure
       browser_context.dispose
-      # Return the PDF data
-      opts[:path] ? opts[:path] : pdf_binary_data
-    end
-
-    def data_url
-      encoded_html = Base64.strict_encode64(@content)
-      "data:text/html;base64,#{encoded_html}"
-    end
-
-    def opts_with_defaults
-      opts = { scale: @scale,
-               printBackground: true,
-               dispayHeaderFooter: true,
-               encoding: :binary,
-               preferCSSPageSize: @prefer_css_page_size }
-
-      opts[:headerTemplate] = @header_html unless @header_html.nil?
-      opts[:footerTemplate] = @footer_html unless @footer_html.nil?
-      opts[:pageRanges] = @page_ranges unless @page_ranges.nil?
-      opts[:path] = @path unless @path.nil?
-      opts[:generateTaggedPDF] = @generate_tagged_pdf unless @generate_tagged_pdf.nil?
-      opts[:format] = @format unless @format.nil?
-      # opts[:paperWidth] = @paper_width unless @paper_width.nil?
-      # opts[:paperHeight] = @paper_height unless @paper_height.nil?
-      opts[:landscape] = @landscape unless @landscape.nil?
-      opts[:marginTop] = @margin[:top] unless @margin[:top].nil?
-      opts[:marginLeft] = @margin[:left] unless @margin[:left].nil?
-      opts[:marginBottom] = @margin[:bottom] unless @margin[:bottom].nil?
-      opts[:marginRight] = @margin[:right] unless @margin[:right].nil?
-
-      puts "opts: #{opts}" if Palapala&.debug
-      opts
     end
 
     def browser
-      # accordng to the docs ferrum is thread safe, however, under heavy load
+      # According to the docs ferrum is thread safe, however, under heavy load
       # we are seeing some issues, so we are using thread locals to have a
       # browser per thread
-      Thread.current[:browser] ||= new_browser
-      # @@browser ||= new_browser
+      Thread.current[:browser] ||= Ferrum::Browser.new(Palapala.ferrum_opts)
     end
 
-    def new_browser
-      Ferrum::Browser.new(Palapala.ferrum_opts)
+    def url
+      if @content
+      encoded_html = Base64.strict_encode64(@content)
+        "data:text/html;base64,#{encoded_html}"
+      elsif @url
+        @url
+      else
+        raise ArgumentError, "Either 'content' or 'url' must be provided"
+      end
     end
 
-    # # TODO use method from template class
-    # def cm_to_inches(value)
-    #   value / 2.54
-    # end
+    def merged_opts(opts)
+      result = {
+        scale: @scale,
+        printBackground: true,
+        dispayHeaderFooter: true,
+        encoding: :binary,
+        preferCSSPageSize: @prefer_css_page_size
+      }
+      result[:headerTemplate]    = @header_html         unless @header_html.nil?
+      result[:footerTemplate]    = @footer_html         unless @footer_html.nil?
+      result[:pageRanges]        = @page_ranges         unless @page_ranges.nil?
+      result[:path]              = @path                unless @path.nil?
+      result[:generateTaggedPDF] = @generate_tagged_pdf unless @generate_tagged_pdf.nil?
+      result[:format]            = @format              unless @format.nil?
+      resultts[:paperWidth]        = @paper_width         unless @paper_width.nil?
+      resultts[:paperHeight]       = @paper_height        unless @paper_height.nil?
+      result[:landscape]         = @landscape           unless @landscape.nil?
+      result[:marginTop]         = @margin[:top]        unless @margin[:top].nil?
+      result[:marginLeft]        = @margin[:left]       unless @margin[:left].nil?
+      result[:marginBottom]      = @margin[:bottom]     unless @margin[:bottom].nil?
+      result[:marginRight]       = @margin[:right]      unless @margin[:right].nil?
+
+      result.merge(opts)
+
+      puts "opts: #{opts}" if Palapala.debug
+      opts
+    end
+
+    def debug(browser_page)
+      browser_page.on('Runtime.consoleAPICalled') do |params|
+        params['args'].each { |r| puts(r['value']) }
+      end
+    end
   end
 end

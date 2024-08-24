@@ -1,8 +1,5 @@
-# frozen_string_literal: true
-
 require_relative 'palapala/pdf'
 
-# Main module for the gem
 module Palapala
   def self.setup
     yield self
