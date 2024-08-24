@@ -8,19 +8,13 @@ module Palapala
     yield self
   end
 
-  def self.ferrum_opts=(ferrum_opts)
-    @ferrum_opts = ferrum_opts
+  class << self
+    attr_accessor :ferrum_opts
+    attr_accessor :defaults
+    attr_accessor :debug
   end
 
-  def self.ferrum_opts
-    @ferrum_opts
-  end
-
-  def self.defaults=(defaults)
-    @defaults = defaults
-  end
-
-  def self.defaults
-    @defaults ||= {}
-  end
+  self.ferrum_opts = {}
+  self.defaults = {}
+  self.debug = false
 end
