@@ -57,17 +57,13 @@ end
 
 2. **Create a PDF from HTML**:
 
-Create a PDF file from HTML in IRB
+Create a PDF file from HTML in `irb`
 
 ```sh
 gem install palapala_pdf
 ```
 
 in IRB, load palapala and create a PDF from an HTML snippet:
-
-```sh
->irb
-```
 
 ```ruby
 require "palapala"
