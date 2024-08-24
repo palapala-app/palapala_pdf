@@ -1,7 +1,8 @@
 # frozen_string_literal: true
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 
 require 'benchmark'
-require_relative '../lib/palapala'
+require 'palapala'
 
 HELLO_WORLD = <<~HTML.freeze
   Hello, world! #{Time.now}.
@@ -13,7 +14,7 @@ Palapala.setup do |config|
   config.defaults.merge! scale: 0.75, format: :A4
 end
 
-Palapala::Pdf.new(DOCUMENT).save('tmp/benchmark.pdf')
+Palapala::PDF.new(DOCUMENT).save('tmp/benchmark.pdf')
 
 # @param concurrency Number of concurrent threads
 # @param iterations Number of iterations per thread
@@ -22,7 +23,7 @@ def benchmark(concurrency, iterations)
     threads = (1..concurrency).map do |_i|
       Thread.new do
         iterations.times do
-          Palapala::Pdf.new(DOCUMENT).binary_data
+          Palapala::PDF.new(DOCUMENT).binary_data
         end
       end
     end

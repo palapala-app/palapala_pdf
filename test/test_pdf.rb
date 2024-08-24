@@ -14,7 +14,7 @@ class TestPdf < Minitest::Test
 
   def test_create_pdf_from_html
     # Create a page
-    pdf = Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>")
+    pdf = Palapala::PDF.new("<h1>Hello, world! #{Time.now}</h1>")
 
     # pdf = Palapala::PDF.new("<h1>Hello, world! #{Time.now}</h1>", header: "<h1>Header</h1>", footer: "<h1>Footer</h1>")
     # pdf = Palapala::PDF.new(url: "http://www.google.com", header: "<h1>Header</h1>", footer: "<h1>Footer</h1>")
