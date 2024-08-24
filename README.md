@@ -81,7 +81,7 @@ require "palapala"
 binary_data = Palapala::PDF.new("<h1>Hello, world! #{Time.now}</h1>").binary_data
 ```
 
-# Paged CSS
+## Paged CSS
 
 Paged CSS is a subset of CSS designed for styling printed documents. It extends standard CSS to handle pagination, page sizes, headers, footers, and other aspects of printed content. Paged CSS is commonly used in scenarios where web content needs to be converted to PDFs or other paginated formats.
 
@@ -99,12 +99,17 @@ Palapala::PDF.new(
   margin: { top: "2cm", bottom: "2cm"}
 ).save("test.pdf")
 )
+```
 
-### Page sizes in CSS
+### Page size, orientation and margins
 
-explain about @paged css elements that set page sizes and margins etc
+#### With CSS
 
-Unlike Paged CSS, where margins are defined within `@page`, in Chromium, you control the header and footer margins separately using `margin-top` and `margin-bottom`. For example:
+todo example
+
+#### As params
+
+todo example
 
 ## Customisation
 
