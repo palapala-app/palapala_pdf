@@ -208,6 +208,38 @@ Total time c:5, n:4 = 0.72492800001055 seconds
 Total time c:20, n:1 = 0.7156629998935387 seconds
 ```
 
+
+## Rails
+
+### `send_data`
+
+The `send_data` method in Rails is used to send binary data as a file download to the user's browser. It allows you to send any type of data, such as PDF files, images, or CSV files, directly to the user without saving the file on the server.
+
+Here's an example of how to use `send_data` to send a PDF file:
+
+```ruby
+def download_pdf
+    pdf_data = Palapala::PDF.new("<h1>Hello, world! #{Time.now}</h1>").binary_data
+    send_data pdf_data, filename: "document.pdf", type: "application/pdf"
+end
+```
+
+In this example, `pdf_data` is the binary data of the PDF file. The `filename` option specifies the name of the file that will be downloaded by the user, and the `type` option specifies the MIME type of the file.
+
+### `render_to_string`
+
+The `render_to_string` method in Rails is used to render a view template to a string without sending it as a response to the user's browser. It allows you to generate HTML or other text-based content that can be used in various ways, such as sending it as an email, saving it to a file, or manipulating it further before sending it as a response.
+
+Here's an example of how to use `render_to_string` to render a view template to a string:
+
+```ruby
+def download_pdf
+    html_string = render_to_string(template: "example/template", layout: "print", locals: { } )
+    pdf_data = Palapala::PDF.new(html_string).binary_data
+    send_data pdf_data, filename: "document.pdf", type: "application/pdf"
+end
+```
+
 ## Docker
 
 In docker as root you must pass the no-sandbox browser option:
