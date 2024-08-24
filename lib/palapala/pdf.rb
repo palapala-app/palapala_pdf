@@ -49,7 +49,7 @@ module Palapala
       url = @url || data_url
       browser_page.go_to(url)
       # Wait for the page to load
-      browser_page.network.wait_for_idle
+      # browser_page.network.wait_for_idle
       # Generate PDF
       pdf_binary_data = browser_page.pdf(**opts_with_defaults.merge(opts))
       # Dispose the context
