@@ -98,7 +98,6 @@ Palapala::PDF.new(
   footer_html: '<div style="text-align: center;">Generated with Palapala PDF</div>',
   margin: { top: "2cm", bottom: "2cm"}
 ).save("test.pdf")
-)
 ```
 
 ### Page size, orientation and margins
