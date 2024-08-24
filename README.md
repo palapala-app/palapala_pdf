@@ -111,6 +111,19 @@ todo example
 
 todo example
 
+## JS based rendering
+
+```html
+  <html>
+    <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.innerHTML += "<p>Current time from JS: " + new Date().toLocaleString() + "</p>";
+      });
+    </script>
+    <body><p>Default body text.</p></body>
+  </html>
+```
+
 ## Customisation
 
 ### Ferrum
