@@ -184,6 +184,8 @@ Your support is greatly appreciated and helps maintain the project!
 
 For Chrome, mode headless=new seems to be slower for pdf rendering cases.
 
+On mac m3 (aug 24), chromium (brew install chromium) is about 3x slower then chrome? Maybe the chromium that get's installed is not ARM optimized?
+
 ## Primitive benchmark
 
 On a macbook m3, the throughput for 'hello world' PDF generation can reach around 25 docs/second when allowing for some concurrency. As Chrome is actually also very efficient, it scales really well for complex documents also. If you run this in Rails, the concurrency is being taken care of either by the front end thread pool or by the workers and you shouldn't have to think about this. (Using an external Chrome)
@@ -203,9 +205,20 @@ Total time c:20, n:1 = 0.7156629998935387 seconds
 In docker as root you must pass the no-sandbox browser option:
 
 ```ruby
-Ferrum::Browser.new(browser_options: { 'no-sandbox': nil })
+Palapala.setup do |config|
+  config.ferrum_opts = { 'no-sandbox': nil }
+end
 ```
-
-It has also been reported that the Chrome process repeatedly crashes when running inside a Docker container on an M1 Mac preventing Ferrum from working. Ferrum should work as expected when deployed to a Docker container on a non-M1 Mac.
+(from Ferrum) It has also been reported that the Chrome process repeatedly crashes when running inside a Docker container on an M1 Mac preventing Ferrum from working. Ferrum should work as expected when deployed to a Docker container on a non-M1 Mac.
 
 ## Heroku
+
+possible buildpacks
+
+https://github.com/heroku/heroku-buildpack-chrome-for-testing
+
+this buildpack install chrome and chromedriver, which is actually not needed, but it's maintained
+
+https://elements.heroku.com/buildpacks/heroku/heroku-buildpack-google-chrome
+
+this buildpack installs chrome, which is all we need, but it's deprecated
