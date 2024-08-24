@@ -202,3 +202,5 @@ Ferrum::Browser.new(browser_options: { 'no-sandbox': nil })
 ```
 
 It has also been reported that the Chrome process repeatedly crashes when running inside a Docker container on an M1 Mac preventing Ferrum from working. Ferrum should work as expected when deployed to a Docker container on a non-M1 Mac.
+
+## Heroku
