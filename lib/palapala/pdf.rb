@@ -66,7 +66,7 @@ module Palapala
     def opts_with_defaults
       opts = { scale: @scale,
                printBackground: true,
-               dispayHeaderFooter: true,
+               displayHeaderFooter: true,
                encoding: :binary,
                preferCSSPageSize: @prefer_css_page_size }
 

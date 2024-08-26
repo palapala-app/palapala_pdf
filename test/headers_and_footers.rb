@@ -41,7 +41,7 @@ result = Palapala::PDF.new(
        generateDocumentOutline: true,
       #  marginTop: 1,
       #  paperWidth: 3,
-       dispayHeaderFooter: true,
+       displayHeaderFooter: true,
        landscape: false,
        headerTemplate: HEADER_HTML)
 
