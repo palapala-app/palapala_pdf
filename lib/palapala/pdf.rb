@@ -33,12 +33,15 @@ module Palapala
     private
 
     def renderer
-      Thread.current[:renderer] ||= Renderer.new
+      Renderer.thread_local_instance
     end
 
     def pdf(**opts)
       puts "Rendering PDF with options: #{opts}" if Palapala.debug
       renderer.html_to_pdf(@content, params: opts_with_defaults.merge(opts))
+    rescue StandardError
+      Thread.current[:renderer] = nil # Reset the renderer on error to avoid reusing a broken renderer
+      raise
     end
 
     def opts_with_defaults

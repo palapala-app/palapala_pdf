@@ -5,11 +5,6 @@ $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'benchmark'
 require 'palapala'
 
-HELLO_WORLD = <<~HTML.freeze
-  Hello, world! #{Time.now}.
-HTML
-DOCUMENT = HELLO_WORLD * 1
-
 debug = ARGV[0] == 'debug'
 
 Palapala.setup do |config|
@@ -50,6 +45,7 @@ benchmark(4, 5)
 
 puts 'benchmarking 320 docs'
 benchmark(1, 320)
+benchmark(2, 320 / 2)
 benchmark(4, 320 / 4)
 benchmark(8, 320 / 8)
 # benchmark(20, 2)

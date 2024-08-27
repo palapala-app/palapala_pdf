@@ -43,7 +43,7 @@ result = Palapala::Pdf.new(
        #  marginTop: 1,
        #  paperWidth: 3,
        displayHeaderFooter: true,
-      #  landscape: false,
+       #  landscape: false,
        headerTemplate: HEADER_HTML)
 
 puts result
