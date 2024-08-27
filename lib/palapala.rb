@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative 'palapala/pdf'
+require_relative 'palapala/web_socket_client'
+require_relative 'palapala/renderer'
 
 # Main module for the gem
 module Palapala
@@ -9,12 +11,11 @@ module Palapala
   end
 
   class << self
-    attr_accessor :ferrum_opts
-    attr_accessor :defaults
-    attr_accessor :debug
+    attr_accessor :defaults, :debug, :headless_chrome_url, :headless_chrome_path
   end
 
-  self.ferrum_opts = {}
+  self.headless_chrome_url = 'http://localhost:9222'
+  self.headless_chrome_path = nil
   self.defaults = {}
   self.debug = false
 end

@@ -1,5 +1,7 @@
-$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
-require "palapala"
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+require 'palapala'
 
 HEADER_HTML = <<~HTML
   <style type="text/css">
@@ -26,7 +28,8 @@ HTML
 
 Palapala.setup do |config|
   config.debug = true
-  config.ferrum_opts = { url: "http://localhost:9222" } # run against a remote Chrome instance
+  config.headless_chrome_url = 'http://localhost:9222' # run against a remote Chrome instance
+  # config.headless_chrome_path = '/usr/bin/google-chrome-stable' # path to Chrome executable
 end
 
 result = Palapala::PDF.new(
@@ -36,11 +39,11 @@ result = Palapala::PDF.new(
   footer_html: '<div style="text-align: center;">Generated with Palapala PDF</div>',
   scale: 0.75,
   prefer_css_page_size: false,
-  margin: { top: 3, bottom: 2 },
-).save("tmp/headers_and_footers.pdf",
+  margin: { top: 3, bottom: 2 }
+).save('tmp/headers_and_footers.pdf',
        generateDocumentOutline: true,
-      #  marginTop: 1,
-      #  paperWidth: 3,
+       #  marginTop: 1,
+       #  paperWidth: 3,
        dispayHeaderFooter: true,
        landscape: false,
        headerTemplate: HEADER_HTML)

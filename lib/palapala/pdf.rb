@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
-require 'ferrum'
-
 module Palapala
   # Page class to generate PDF from HTML content using Chrome in headless mode in a thread-safe way
   # @param page_ranges Empty string means all pages, e.g., "1-3, 5, 7-9"
   class PDF
     def initialize(content = nil,
-                   url: nil,
                    header_html: nil,
                    footer_html: nil,
                    generate_tagged_pdf: Palapala.defaults.fetch(:generate_tagged_pdf, false),
@@ -16,7 +13,6 @@ module Palapala
                    page_ranges: Palapala.defaults.fetch(:page_ranges, nil),
                    margin: Palapala.defaults.fetch(:margin, {}))
       @content = content
-      @url = url
       @header_html = header_html
       @footer_html = footer_html
       @generate_tagged_pdf = generate_tagged_pdf
@@ -31,36 +27,17 @@ module Palapala
     end
 
     def save(path, **opts)
-      pdf(path:, **opts)
+      File.binwrite(path, pdf(**opts))
     end
 
     private
 
-    def pdf(**opts)
-      browser_context = browser.contexts.create
-      browser_page = browser_context.page
-      # # output console logs for this page
-      if Palapala.debug
-        browser_page.on('Runtime.consoleAPICalled') do |params|
-          params['args'].each { |r| puts(r['value']) }
-        end
-      end
-      # open the page
-      url = @url || data_url
-      browser_page.go_to(url)
-      # Wait for the page to load
-      # browser_page.network.wait_for_idle
-      # Generate PDF
-      pdf_binary_data = browser_page.pdf(**opts_with_defaults.merge(opts))
-      # Dispose the context
-      browser_context.dispose
-      # Return the PDF data
-      opts[:path] ? opts[:path] : pdf_binary_data
+    def renderer
+      Thread.current[:renderer] ||= Renderer.new
     end
 
-    def data_url
-      encoded_html = Base64.strict_encode64(@content)
-      "data:text/html;base64,#{encoded_html}"
+    def pdf(**opts)
+      renderer.html_to_pdf(@content, params: opts_with_defaults.merge(opts))
     end
 
     def opts_with_defaults
@@ -83,26 +60,7 @@ module Palapala
       opts[:marginLeft] = @margin[:left] unless @margin[:left].nil?
       opts[:marginBottom] = @margin[:bottom] unless @margin[:bottom].nil?
       opts[:marginRight] = @margin[:right] unless @margin[:right].nil?
-
-      puts "opts: #{opts}" if Palapala&.debug
       opts
     end
-
-    def browser
-      # accordng to the docs ferrum is thread safe, however, under heavy load
-      # we are seeing some issues, so we are using thread locals to have a
-      # browser per thread
-      Thread.current[:browser] ||= new_browser
-      # @@browser ||= new_browser
-    end
-
-    def new_browser
-      Ferrum::Browser.new(Palapala.ferrum_opts)
-    end
-
-    # # TODO use method from template class
-    # def cm_to_inches(value)
-    #   value / 2.54
-    # end
   end
 end

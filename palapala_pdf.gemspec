@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ['github.com@handekyn.com']
 
   spec.summary = 'Convert HTML into PDF directly from Ruby using Chrome/Chromium.'
-  spec.description = 'This gem uses Ferrum to render HTML into a PDF using Chrom(e)(ium) with minimal dependencies.'
+  spec.description = 'This gem uses faw web sockets to render HTML into a PDF using Chrom(e)(ium) with minimal dependencies.'
   spec.homepage = 'https://github.com/palapala-app/palapala_pdf'
   spec.required_ruby_version = '>= 3.1'
   spec.license = 'MIT'
@@ -34,7 +34,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency 'ferrum', '~> 0'
+  spec.add_dependency 'base64', '~> 0'
+  spec.add_dependency 'websocket-driver', '~> 0'
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
