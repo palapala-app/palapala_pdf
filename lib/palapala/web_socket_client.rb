@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'uri'
-require 'socket'
+require "uri"
+require "socket"
 
 module Palapala
   # Create a socket wrapper that conforms to what the websocket-driver expects

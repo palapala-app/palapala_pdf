@@ -5,8 +5,8 @@ require_relative 'lib/palapala/version'
 Gem::Specification.new do |spec|
   spec.name = 'palapala_pdf'
   spec.version = Palapala::VERSION
-  spec.authors = ['Koen Handekyn']
-  spec.email = ['github.com@handekyn.com']
+  spec.authors = [ 'Koen Handekyn' ]
+  spec.email = [ 'github.com@handekyn.com' ]
 
   spec.summary = 'Convert HTML into PDF directly from Ruby using Chrome/Chromium.'
   spec.description = 'This gem uses faw web sockets to render HTML into a PDF using Chrom(e)(ium) with minimal dependencies.'
@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   end
   spec.bindir = 'exe'
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
-  spec.require_paths = ['lib']
+  spec.require_paths = [ 'lib' ]
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency 'base64', '~> 0'

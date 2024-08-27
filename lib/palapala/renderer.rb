@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'json'
-require 'net/http'
-require 'websocket/driver'
+require "json"
+require "net/http"
+require "websocket/driver"
 
 module Palapala
   # Render HTML content to PDF using Chrome in headless mode with minimal dependencies
@@ -18,12 +18,12 @@ module Palapala
       # Start the WebSocket handshake
       @driver.start
       # Initialize the protocol to get the page events
-      send_command_and_wait_for_result('Page.enable')
+      send_command_and_wait_for_result("Page.enable")
     end
 
     def self.thread_local_instance
       Thread.current[:renderer] ||= begin
-        puts 'Creating new renderer' if Palapala.debug
+        puts "Creating new renderer" if Palapala.debug
         Renderer.new
       end
     end
@@ -65,15 +65,15 @@ module Palapala
     # @return [Hash] The result of the command
     def send_command_and_wait_for_result(method, params: {})
       send_command(method, params:) do
-        @response && @response['id'] == current_id
+        @response && @response["id"] == current_id
       end
-      @response['result']
+      @response["result"]
     end
 
     # Method to send a CDP command and wait for a specific method to be called
     def send_command_and_wait_for_event(method, event_name:, params: {})
       send_command(method, params:) do
-        @response && @response['method'] == event_name
+        @response && @response["method"] == event_name
       end
     end
 
@@ -82,10 +82,10 @@ module Palapala
     # @param html [String] The HTML content to convert to PDF
     # @param params [Hash] Additional parameters to pass to the CDP command
     def html_to_pdf(html, params: {})
-      send_command_and_wait_for_event('Page.navigate', params: { url: data_url_for_html(html) },
-                                                       event_name: 'Page.frameStoppedLoading')
-      result = send_command_and_wait_for_result('Page.printToPDF', params:)
-      Base64.decode64(result['data'])
+      send_command_and_wait_for_event("Page.navigate", params: { url: data_url_for_html(html) },
+                                                       event_name: "Page.frameStoppedLoading")
+      result = send_command_and_wait_for_result("Page.printToPDF", params:)
+      Base64.decode64(result["data"])
     end
 
     def close
@@ -105,17 +105,17 @@ module Palapala
       uri = URI("#{Palapala.headless_chrome_url}/json/new")
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Put.new(uri)
-      request['Content-Type'] = 'application/json'
+      request["Content-Type"] = "application/json"
       response = http.request(request)
       tab_info = JSON.parse(response.body)
-      websocket_url = tab_info['webSocketDebuggerUrl']
+      websocket_url = tab_info["webSocketDebuggerUrl"]
       puts "WebSocket URL: #{websocket_url}" if Palapala.debug
       websocket_url
     end
 
     # Manage the Chrome child process
     module ChromeProcess
-      def self.port_in_use?(port = 9222, host = '127.0.0.1')
+      def self.port_in_use?(port = 9222, host = "127.0.0.1")
         server = TCPServer.new(host, port)
         server.close
         false
@@ -137,22 +137,22 @@ module Palapala
       def self.kill_chrome
         return if @chrome_process_id.nil?
 
-        Process.kill('KILL', @chrome_process_id) # Kill the process
+        Process.kill("KILL", @chrome_process_id) # Kill the process
         Process.wait(@chrome_process_id) # Wait for the process to finish
       end
 
       def self.chrome_path
         return Palapala.headless_chrome_path if Palapala.headless_chrome_path
 
-        case RbConfig::CONFIG['host_os']
+        case RbConfig::CONFIG["host_os"]
         when /darwin/
-          '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+          "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
         when /linux/
-          '/usr/bin/google-chrome' # or "/usr/bin/chromium-browser"
+          "/usr/bin/google-chrome" # or "/usr/bin/chromium-browser"
         when /win|mingw|cygwin/
           "#{ENV.fetch('ProgramFiles(x86)', nil)}\\Google\\Chrome\\Application\\chrome.exe"
         else
-          raise 'Unsupported OS'
+          raise "Unsupported OS"
         end
       end
 
@@ -162,7 +162,7 @@ module Palapala
 
         # Define the path and parameters separately
         # chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-        params = ['--headless', '--disable-gpu', '--remote-debugging-port=9222']
+        params = [ "--headless", "--disable-gpu", "--remote-debugging-port=9222" ]
 
         # Spawn the process with the path and parameters
         @chrome_process_id = Process.spawn(chrome_path, *params)
@@ -175,7 +175,7 @@ module Palapala
         at_exit do
           if @chrome_process_id
             begin
-              Process.kill('TERM', @chrome_process_id)
+              Process.kill("TERM", @chrome_process_id)
               Process.wait(@chrome_process_id)
               puts "Child process #{@chrome_process_id} terminated."
             rescue Errno::ESRCH
@@ -187,7 +187,7 @@ module Palapala
         end
 
         # Handle when the process is killed
-        trap('SIGCHLD') do
+        trap("SIGCHLD") do
           while (@chrome_process_id = Process.wait(-1, Process::WNOHANG))
             break if @chrome_process_id.nil?
 
