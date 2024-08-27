@@ -18,7 +18,7 @@ Palapala.setup do |config|
   config.defaults.merge! scale: 0.75, format: :A4
 end
 
-Palapala::PDF.new(DOCUMENT).save('tmp/benchmark.pdf')
+Palapala::Pdf.new(DOCUMENT).save('tmp/benchmark.pdf')
 
 # @param concurrency Number of concurrent threads
 # @param iterations Number of iterations per thread
@@ -28,7 +28,7 @@ def benchmark(concurrency, iterations)
       Thread.new do
         iterations.times do |j|
           doc = "Hello #{i}, world #{j}! #{Time.now}."
-          Palapala::PDF.new(doc).save("tmp/benchmark_#{i}_#{j}.pdf")
+          Palapala::Pdf.new(doc).save("tmp/benchmark_#{i}_#{j}.pdf")
         end
       end
     end

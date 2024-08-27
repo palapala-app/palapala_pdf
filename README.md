@@ -8,7 +8,7 @@ This is how easy and powerfull PDF generation can be in Ruby:
 
 ```ruby
 require "palapala"
-Palapala::PDF.new("<h1>Hello, world! #{Time.now}</h1>").save('hello.pdf')
+Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").save('hello.pdf')
 ```
 
 And this while having the most modern HTML/CSS/JS availlable to you: flex, grid, canvas, you name it.
@@ -76,14 +76,14 @@ in IRB, load palapala and create a PDF from an HTML snippet:
 
 ```ruby
 require "palapala"
-Palapala::PDF.new("<h1>Hello, world! #{Time.now}</h1>").save('hello.pdf')
+Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").save('hello.pdf')
 ```
 
-Instantiate a new Palapala::PDF object with your HTML content and generate the PDF binary data.
+Instantiate a new Palapala::Pdf object with your HTML content and generate the PDF binary data.
 
 ```ruby
 require "palapala"
-binary_data = Palapala::PDF.new("<h1>Hello, world! #{Time.now}</h1>").binary_data
+binary_data = Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").binary_data
 ```
 
 ## Paged CSS
@@ -97,7 +97,7 @@ When using Chromium-based rendering engines, headers and footers are not control
 With palapala PDF headers and footers are defined using `header_html` and `footer_html` options. These allow you to insert HTML content directly into the header or footer areas.
 
 ```ruby
-Palapala::PDF.new(
+Palapala::Pdf.new(
   "<p>Hello world</>",
   header_html: '<div style="text-align: center;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>',
   footer_html: '<div style="text-align: center;">Generated with Palapala PDF</div>',
@@ -198,7 +198,7 @@ Here's an example of how to use `render_to_string` to render a view template to 
 ```ruby
 def download_pdf
     html_string = render_to_string(template: "example/template", layout: "print", locals: { } )
-    pdf_data = Palapala::PDF.new(html_string).binary_data
+    pdf_data = Palapala::Pdf.new(html_string).binary_data
     send_data pdf_data, filename: "document.pdf", type: "application/pdf"
 end
 ```

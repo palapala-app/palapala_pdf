@@ -18,5 +18,5 @@ Palapala.setup do |config|
   config.debug = true
 end
 
-result = Palapala::PDF.new(DOCUMENT).save('tmp/js_based_rendering.pdf')
+result = Palapala::Pdf.new(DOCUMENT).save('tmp/js_based_rendering.pdf')
 puts result

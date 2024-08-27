@@ -16,13 +16,11 @@ HEADER_HTML = <<~HTML
       text-align: center;
       vertical-align: middle;
       width: 100%;
+      border: 1px solid black;
     }
   </style>
   <div class="header" style="text-align: center">
     Page <span class="pageNumber"></span> of <span class="totalPages"></span>
-  </div>
-  <div class="header">
-    Page <span class="pageNumber">?</span> of <span class="totalPages">?</span>
   </div>
 HTML
 
@@ -32,7 +30,7 @@ Palapala.setup do |config|
   # config.headless_chrome_path = '/usr/bin/google-chrome-stable' # path to Chrome executable
 end
 
-result = Palapala::PDF.new(
+result = Palapala::Pdf.new(
   # "<style>@page { size: A4 landscape; }</style><p>Hello world #{Time.now}</>",
   "<h1>Title</h1><p>Hello world #{Time.now}</>",
   header_html: HEADER_HTML,
@@ -41,11 +39,11 @@ result = Palapala::PDF.new(
   prefer_css_page_size: false,
   margin: { top: 3, bottom: 2 }
 ).save('tmp/headers_and_footers.pdf',
-       generateDocumentOutline: true,
+       generateDocumentOutline: false,
        #  marginTop: 1,
        #  paperWidth: 3,
-       dispayHeaderFooter: true,
-       landscape: false,
+       displayHeaderFooter: true,
+      #  landscape: false,
        headerTemplate: HEADER_HTML)
 
 puts result

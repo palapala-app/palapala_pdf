@@ -14,7 +14,7 @@ class TestPdf < Minitest::Test
 
   def test_create_pdf_from_html
     # Create a page
-    pdf = Palapala::PDF.new("<h1>Hello, world! #{Time.now}</h1>")
+    pdf = Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>")
 
     # Create a PDF from the HTML content
     binary_data = pdf.binary_data

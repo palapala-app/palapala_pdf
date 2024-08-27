@@ -3,7 +3,7 @@
 module Palapala
   # Page class to generate PDF from HTML content using Chrome in headless mode in a thread-safe way
   # @param page_ranges Empty string means all pages, e.g., "1-3, 5, 7-9"
-  class PDF
+  class Pdf
     def initialize(content = nil,
                    header_html: nil,
                    footer_html: nil,
@@ -37,13 +37,14 @@ module Palapala
     end
 
     def pdf(**opts)
+      puts "Rendering PDF with options: #{opts}" if Palapala.debug
       renderer.html_to_pdf(@content, params: opts_with_defaults.merge(opts))
     end
 
     def opts_with_defaults
       opts = { scale: @scale,
                printBackground: true,
-               dispayHeaderFooter: true,
+               displayHeaderFooter: true,
                encoding: :binary,
                preferCSSPageSize: @prefer_css_page_size }
 
