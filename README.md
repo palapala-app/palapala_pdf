@@ -1,17 +1,20 @@
 # PDF Generation for your Rubies
 
+<div style="float: right; padding: 3em"><img src="https://raw.githubusercontent.com/palapala-app/palapala_pdf/main/assets/images/logo.webp" alt="Palapala PDF Logo" width="200"></div>
+
 This project is a Ruby gem that provides functionality for generating PDF files from HTML using the Chrome browser. It allows you to easily convert HTML content into PDF documents, making it convenient for tasks such as generating reports, invoices, or any other printable documents. The gem provides a simple and intuitive API for converting HTML to PDF, and it leverages the power and flexibility of the Chrome browser's rendering engine to ensure accurate and high-quality PDF output. With this gem, you can easily integrate PDF generation capabilities into your Ruby applications.
 
 At the core, this project leverages the same rendering engine as [Grover](https://github.com/Studiosity/grover), but with significantly reduced overhead and dependencies. Instead of relying on the full Grover/Puppeteer/NodeJS stack, this project uses a raw web socket to enable direct communication from Ruby to a headless Chrome or Chromium browser. This approach ensures efficieny while providing a streamlined alternative for rendering tasks without sacrificing performance or flexibility.
 
-This is how easy and powerfull PDF generation can be in Ruby:
+This is how easy PDF generation can be in Ruby:
 
 ```ruby
 require "palapala"
 Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").save('hello.pdf')
 ```
+And this while having the most modern HTML/CSS/JS availlable to you: flex, grid, canvas, ...
 
-And this while having the most modern HTML/CSS/JS availlable to you: flex, grid, canvas, you name it.
+A core goal of this project is performance, and it is designed to be exceptionally fast. By leveraging **direct communication** with a headless Chrome or Chromium browser via a **raw web socket**, the gem minimizes overhead and dependencies, enabling PDF generation at speeds that significantly outperform other solutions. Whether generating simple or complex documents, this gem ensures that your Ruby applications can handle PDF tasks efficiently and at scale.
 
 ## Installation
 
