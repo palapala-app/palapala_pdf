@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Palapala
   # Page class to generate PDF from HTML content using Chrome in headless mode in a thread-safe way
   # @param page_ranges Empty string means all pages, e.g., "1-3, 5, 7-9"
