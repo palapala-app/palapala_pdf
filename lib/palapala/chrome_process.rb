@@ -1,7 +1,6 @@
 module Palapala
   # Manage the Chrome child process
   module ChromeProcess
-
     # Check if the port is in use
     def self.port_in_use?(port = 9222, host = "127.0.0.1")
       server = TCPServer.new(host, port)
@@ -59,7 +58,7 @@ module Palapala
 
       # Define the path and parameters separately
       # chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-      params = ["--headless", "--disable-gpu", "--remote-debugging-port=9222"]
+      params = [ "--headless", "--disable-gpu", "--remote-debugging-port=9222" ]
       params.merge!(Palapala.chrome_params) if Palapala.chrome_params
 
       # Spawn the process with the path and parameters
