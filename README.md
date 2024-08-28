@@ -1,6 +1,6 @@
 # PDF Generation for your Rubies
 
-<div style="float: right; padding: 3em"><img src="https://raw.githubusercontent.com/palapala-app/palapala_pdf/main/assets/images/logo.webp" alt="Palapala PDF Logo" width="200"></div>
+<div align="center"><img src="https://raw.githubusercontent.com/palapala-app/palapala_pdf/main/assets/images/logo.webp" alt="Palapala PDF Logo" width="200"></div>
 
 This project is a Ruby gem that provides functionality for generating PDF files from HTML using the Chrome browser. It allows you to easily convert HTML content into PDF documents, making it convenient for tasks such as generating reports, invoices, or any other printable documents. The gem provides a simple and intuitive API for converting HTML to PDF, and it leverages the power and flexibility of the Chrome browser's rendering engine to ensure accurate and high-quality PDF output. With this gem, you can easily integrate PDF generation capabilities into your Ruby applications.
 
@@ -149,6 +149,7 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/palapa
 
 - [Kenneth Geerts](https://github.com/kennethgeerts) - Your foundational contributions to simplicity are greatly appreciated.
 - [Eugen Neagoe](https://github.com/eneagoe) - Thank you for your valuable input, feedback and opinions.
+- [Radu Bogoevici](https://github.com/codenighter) - Thanks for test driving, and all help big and small.
 
 ## Sponsor This Project
 
