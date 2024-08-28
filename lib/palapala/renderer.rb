@@ -1,8 +1,8 @@
-# frozen_string_literal: true
-
 require "json"
 require "net/http"
 require "websocket/driver"
+require_relative "./web_socket_client"
+require_relative "./chrome_process"
 
 module Palapala
   # Render HTML content to PDF using Chrome in headless mode with minimal dependencies
@@ -21,11 +21,14 @@ module Palapala
       send_command_and_wait_for_result("Page.enable")
     end
 
+    # Create a thread-local instance of the renderer
     def self.thread_local_instance
-      Thread.current[:renderer] ||= begin
-        puts "Creating new renderer" if Palapala.debug
-        Renderer.new
-      end
+      Thread.current[:renderer] ||= Renderer.new
+    end
+
+    # Reset the thread-local instance of the renderer
+    def self.reset
+      Thread.current[:renderer] = nil
     end
 
     # Callback to handle the incomming WebSocket messages
@@ -88,6 +91,10 @@ module Palapala
       Base64.decode64(result["data"])
     end
 
+    def self.html_to_pdf(html, params: {})
+      thread_local_instance.html_to_pdf(html, params: params)
+    end
+
     def close
       @driver.close
       @client.close
@@ -95,6 +102,7 @@ module Palapala
 
     private
 
+    # Convert the HTML content to a data URL
     def data_url_for_html(html)
       "data:text/html;base64,#{Base64.strict_encode64(html)}"
     end
@@ -111,94 +119,6 @@ module Palapala
       websocket_url = tab_info["webSocketDebuggerUrl"]
       puts "WebSocket URL: #{websocket_url}" if Palapala.debug
       websocket_url
-    end
-
-    # Manage the Chrome child process
-    module ChromeProcess
-      def self.port_in_use?(port = 9222, host = "127.0.0.1")
-        server = TCPServer.new(host, port)
-        server.close
-        false
-      rescue Errno::EADDRINUSE
-        true
-      end
-
-      def self.chrome_process_healthy?
-        return false if @chrome_process_id.nil?
-
-        begin
-          Process.kill(0, @chrome_process_id) # Check if the process is alive
-          true
-        rescue Errno::ESRCH, Errno::EPERM
-          false
-        end
-      end
-
-      def self.kill_chrome
-        return if @chrome_process_id.nil?
-
-        Process.kill("KILL", @chrome_process_id) # Kill the process
-        Process.wait(@chrome_process_id) # Wait for the process to finish
-      end
-
-      def self.chrome_path
-        return Palapala.headless_chrome_path if Palapala.headless_chrome_path
-
-        case RbConfig::CONFIG["host_os"]
-        when /darwin/
-          "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-        when /linux/
-          "/usr/bin/google-chrome" # or "/usr/bin/chromium-browser"
-        when /win|mingw|cygwin/
-          "#{ENV.fetch('ProgramFiles(x86)', nil)}\\Google\\Chrome\\Application\\chrome.exe"
-        else
-          raise "Unsupported OS"
-        end
-      end
-
-      def self.spawn_chrome
-        return if port_in_use?
-        return if chrome_process_healthy?
-
-        # Define the path and parameters separately
-        # chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-        params = [ "--headless", "--disable-gpu", "--remote-debugging-port=9222" ]
-
-        # Spawn the process with the path and parameters
-        @chrome_process_id = Process.spawn(chrome_path, *params)
-
-        # Wait until the port is in use
-        sleep 0.1 until port_in_use?
-        # Detach the process so it runs in the background
-        Process.detach(@chrome_process_id)
-
-        at_exit do
-          if @chrome_process_id
-            begin
-              Process.kill("TERM", @chrome_process_id)
-              Process.wait(@chrome_process_id)
-              puts "Child process #{@chrome_process_id} terminated."
-            rescue Errno::ESRCH
-              puts "Child process #{@chrome_process_id} is already terminated."
-            rescue Errno::ECHILD
-              puts "No child process #{@chrome_process_id} found."
-            end
-          end
-        end
-
-        # Handle when the process is killed
-        trap("SIGCHLD") do
-          while (@chrome_process_id = Process.wait(-1, Process::WNOHANG))
-            break if @chrome_process_id.nil?
-
-            puts "Process #{@chrome_process_id} was killed."
-            # Handle the error or restart the process if necessary
-            @chrome_process_id = nil
-          end
-        rescue Errno::ECHILD
-          @chrome_process_id = nil
-        end
-      end
     end
   end
 end
