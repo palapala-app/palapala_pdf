@@ -1,4 +1,6 @@
 inherit_from: .rubocop_todo.yml
+# Omakase Ruby styling for Rails
+inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
 # This is a basic RuboCop configuration file
 AllCops:
@@ -12,3 +14,4 @@ AllCops:
 require:
   - rubocop-minitest
   - rubocop-rake
+  - rubocop-performance

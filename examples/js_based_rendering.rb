@@ -1,5 +1,7 @@
-$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
-require "palapala"
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+require 'palapala'
 
 DOCUMENT = <<~HTML
   <html>
@@ -16,5 +18,5 @@ Palapala.setup do |config|
   config.debug = true
 end
 
-result = Palapala::PDF.new(DOCUMENT).save("tmp/js_based_rendering.pdf")
+result = Palapala::Pdf.new(DOCUMENT).save('tmp/js_based_rendering.pdf')
 puts result
