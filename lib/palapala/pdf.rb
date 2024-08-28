@@ -70,7 +70,8 @@ module Palapala
     def binary_data
       puts "Rendering PDF with params: #{@opts}" if Palapala.debug
       Renderer.html_to_pdf(@content, params: @opts)
-    rescue StandardError
+    rescue StandardError => e
+      puts "Error rendering PDF: #{e.message}"
       Renderer.reset
       raise
     end
