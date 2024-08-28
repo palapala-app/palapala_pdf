@@ -8,6 +8,7 @@ module Palapala
   # Render HTML content to PDF using Chrome in headless mode with minimal dependencies
   class Renderer
     def initialize
+      puts "Initializing a renderer" if Palapala.debug
       # Create an instance of WebSocketClient with the WebSocket URL
       @client = Palapala::WebSocketClient.new(websocket_url)
       # Create the WebSocket driver
@@ -28,6 +29,7 @@ module Palapala
 
     # Reset the thread-local instance of the renderer
     def self.reset
+      puts "Clearing the thread local renderer" if Palapala.debug
       Thread.current[:renderer] = nil
     end
 
