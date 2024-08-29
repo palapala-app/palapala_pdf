@@ -4,7 +4,9 @@
 
 This project is a Ruby gem that provides functionality for generating PDF files from HTML using the Chrome browser. It allows you to easily convert HTML content into PDF documents, making it convenient for tasks such as generating reports, invoices, or any other printable documents. The gem provides a simple and intuitive API for converting HTML to PDF, and it leverages the power and flexibility of the Chrome browser's rendering engine to ensure accurate and high-quality PDF output. With this gem, you can easily integrate PDF generation capabilities into your Ruby applications.
 
-At the core, this project leverages the same rendering engine as [Grover](https://github.com/Studiosity/grover), but with significantly reduced overhead and dependencies. Instead of relying on the full Grover/Puppeteer/NodeJS stack, this project uses a raw web socket to enable direct communication from Ruby to a headless Chrome or Chromium browser. This approach ensures efficieny while providing a streamlined alternative for rendering tasks without sacrificing performance or flexibility. It leverages work from [Puppeteer](https://pptr.dev/browsers-api/) (@puppeteer/browsers) to install a local Chrome-Headless-Shell if no Chrome is running, but that requires node (npx) to be available.
+At the core, this project leverages the Chrome rendering engine, but with significantly reduced overhead and dependencies. Instead of relying on the full Grover/Puppeteer/NodeJS stack, this project uses a raw web socket to enable direct communication from Ruby to a headless Chrome or Chromium browser. This approach ensures efficieny while providing a streamlined alternative for rendering tasks without sacrificing performance or flexibility.
+
+It leverages work from [Puppeteer](https://pptr.dev/browsers-api/) (@puppeteer/browsers) to install a local Chrome-Headless-Shell if no Chrome is running, but that requires node (npx) to be available.
 
 This is how easy PDF generation can be in Ruby:
 
@@ -39,7 +41,250 @@ If you are not using bundler to manage dependencies, you can install the gem by 
 $ gem install palapala_pdf
 ```
 
+### Examples
+
+#### Headers and Footers
+
+TODO
+
+#### Page sizes and margins
+
+Paged CSS, also known as @page CSS, is used to control the layout and appearance of printed documents. It allows you to define page-specific styles, such as sizes and margins, which are crucial for generating well-formatted PDFs.
+
+You can specify the size of the page using predefined sizes or custom dimensions. Common predefined sizes include A4, A3, letter, etc.
+
+Margins can be set for the top, right, bottom, and left sides of the page. You can specify all four margins at once or individually.
+
+You can also define named pages for different sections of your document.
+
+##### Example: A4 Page Size
+
+```css
+@page {
+  size: A4;
+}
+```
+
+##### Example: Custom Page Size
+
+```css
+@page {
+  size: 8.5in 11in; /* Width x Height */
+}
+```
+
+##### Example: Uniform Margins
+
+```css
+@page {
+  margin: 1in; /* 1 inch on all sides */
+}
+```
+
+##### Example: Individual Margins
+
+```css
+@page {
+  margin: 1in 0.5in 1in 0.5in; /* Top, Right, Bottom, Left */
+}
+```
+
+##### Example: Different First Page
+
+```css
+@page first {
+  size: A4;
+  margin: 2in; /* Larger margin for the first page */
+}
+
+@page {
+  size: A4;
+  margin: 1in;
+}
+
+body {
+  counter-reset: page;
+}
+
+body:first {
+  page: first;
+}
+```
+
+###### Full Example
+
+Here's a full example combining various aspects:
+
+```css
+@page {
+  size: A4;
+  margin: 1in;
+}
+
+@page landscape {
+  size: A4 landscape;
+  margin: 0.5in;
+}
+
+body {
+  counter-reset: page;
+}
+
+body:first {
+  page: first;
+}
+
+@page first {
+  size: A4;
+  margin: 2in;
+}
+
+h1 {
+  page-break-before: always;
+}
+```
+
+In this example:
+
+- The default page size is A4 with 1-inch margins.
+- A named page landscape is defined with A4 size in landscape orientation and 0.5-inch margins.
+- The first page has a larger margin of 2 inches.
+- The h1 elements will always start on a new page.
+- These examples should help you get started with defining page sizes and margins using @page CSS for your PDF generation needs.
+
+#### Page breaks
+
+Paged CSS allows you to control how content is divided across pages when printing or generating PDFs. Page breaks are an essential part of this, as they determine where a new page starts. You can control page breaks using the `page-break-before`, `page-break-after`, and `page-break-inside` properties.
+
+##### Page Break Properties
+
+1. **`page-break-before`**: Forces a page break before the element.
+2. **`page-break-after`**: Forces a page break after the element.
+3. **`page-break-inside`**: Prevents or allows a page break inside the element.
+
+##### Values
+
+- `auto`: Default. Neither forces nor prevents a page break.
+- `always` Always forces a page break.
+- `avoid`: Avoids a page break inside the element.
+- `left`: Forces a page break so that the next page is a left page.
+- `right`: Forces a page break so that the next page is a right page.
+
+##### Forcing a Page Break Before an Element
+
+```css
+h1 {
+  page-break-before: always;
+}
+```
+
+This ensures that every `h1` starts on a new page.
+
+##### Forcing a Page Break After an Element
+
+```css
+p {
+  page-break-after: always;
+}
+```
+
+This ensures that every `p` element ends with a page break, starting the next content on a new page.
+
+##### Avoiding Page Break Inside an Element
+
+```css
+table {
+  page-break-inside: avoid;
+}
+```
+
+This prevents a table from being split across two pages.
+
+##### Full Example
+
+Here's a full example combining various page break properties:
+
+```css
+@page {
+  size: A4;
+  margin: 1in;
+}
+
+h1 {
+  page-break-before: always;
+}
+
+h2 {
+  page-break-after: avoid;
+}
+
+table {
+  page-break-inside: avoid;
+}
+```
+
+In this example:
+- Every `h1` element will start on a new page.
+- `h2` elements will avoid causing a page break after them.
+- Tables will avoid being split across pages.
+
+##### Practical Use Cases
+
+- **Chapter Titles**: Use `page-break-before: always;` for chapter titles to ensure each chapter starts on a new page.
+- **Sections**: Use `page-break-after: always;` for sections that should end with a page break.
+- **Tables and Figures**: Use `page-break-inside: avoid;` to keep tables and figures from being split across pages.
+
+These properties help you control the layout of your printed documents or PDFs, ensuring that content is presented in a clear and organized manner.
+
+#### Tables accross Pages
+
+To ensure that table headers and footers repeat on every page in paged CSS, you can use the `display` property with the values `table-header-group` and `table-footer-group`.
+
+```css
+thead {
+  display: table-header-group;
+}
+
+tfoot {
+  display: table-footer-group;
+}
+```
+
+This ensures that the `<thead>` and `<tfoot>` sections of your table are repeated on every page where the table appears.
+
+##### Example
+
+```html
+<table>
+  <thead>
+    <tr>
+      <th>Header 1</th>
+      <th>Header 2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Data 1</td>
+      <td>Data 2</td>
+    </tr>
+    <!-- More rows -->
+  </tbody>
+  <tfoot>
+    <tr>
+      <td>Footer 1</td>
+      <td>Footer 2</td>
+    </tr>
+  </tfoot>
+</table>
+```
+
+In this example:
+- The `<thead>` section will be repeated at the top of each page.
+- The `<tfoot>` section will be repeated at the bottom of each page.
+
 ### Connecting to Chrome
+
+TODO
 
 Palapa PDF will go through this process
 
