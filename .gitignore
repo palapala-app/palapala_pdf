@@ -1,3 +1,5 @@
-tmp/
-*.log
 *.gem
+*.log
+chrome-headless-shell/
+chrome/
+tmp/
