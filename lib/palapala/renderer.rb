@@ -24,7 +24,7 @@ module Palapala
 
     def websocket_url
       self.class.websocket_url
-    rescue Errno::ECONNREFUSED => e
+    rescue Errno::ECONNREFUSED
       ChromeProcess.spawn_chrome # Spawn a new Chrome process
       self.class.websocket_url # Retry (once)
     end
