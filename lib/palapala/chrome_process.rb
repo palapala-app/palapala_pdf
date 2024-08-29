@@ -1,3 +1,6 @@
+require "open3"
+require "pathname"
+
 module Palapala
   # Manage the Chrome child process
   module ChromeProcess
@@ -52,17 +55,60 @@ module Palapala
       end
     end
 
+    def self.npx_installed?
+      system("which npx > /dev/null 2>&1")
+    end
+
+    def self.spawn_chrome_headless_server_with_npx
+      # Run the command and capture the output
+      puts "Installing latest stable chrome-headless-shell..."
+      output, status = Open3.capture2("npx --yes @puppeteer/browsers install chrome-headless-shell@#{Palapala.chrome_headless_shell_version}")
+
+      if status.success?
+        # Extract the path from the output
+        result = output.lines.find { |line| line.include?("chrome-headless-shell@") }
+        if result.nil?
+          raise "Failed to install chrome-headless-shell"
+        end
+        _, chrome_path = result.split(" ", 2).map(&:strip)
+
+        # Directory you want the relative path from (current working directory)
+        base_dir = Dir.pwd
+
+        # Convert absolute path to relative path
+        relative_path = Pathname.new(chrome_path).relative_path_from(Pathname.new(base_dir)).to_s
+
+        puts "Launching chrome-headless-shell at #{relative_path}" if Palapala.debug
+        # Display the version
+        system("#{chrome_path} --version") if Palapala.debug
+        # Launch chrome-headless-shell with the --remote-debugging-port parameter
+        if Palapala.debug
+          spawn(chrome_path, "--remote-debugging-port=9222", "--disable-gpu")
+        else
+          spawn(chrome_path, "--remote-debugging-port=9222", "--disable-gpu", out: "/dev/null", err: "/dev/null")
+        end
+      else
+        raise "Failed to install chrome-headless-shell"
+      end
+    end
+
+    def self.spawn_chrome_from_path
+      params = [ "--headless", "--disable-gpu", "--remote-debugging-port=9222" ]
+      params.merge!(Palapala.chrome_params) if Palapala.chrome_params
+      # Spawn an existing chrome with the path and parameters
+      Process.spawn(chrome_path, *params)
+    end
+
     # Spawn a Chrome child process
     def self.spawn_chrome
       return if chrome_running?
 
-      # Define the path and parameters separately
-      # chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-      params = [ "--headless", "--disable-gpu", "--remote-debugging-port=9222" ]
-      params.merge!(Palapala.chrome_params) if Palapala.chrome_params
-
-      # Spawn the process with the path and parameters
-      @chrome_process_id = Process.spawn(chrome_path, *params)
+      @chrome_process_id =
+        if Palapala.headless_chrome_path.nil? && self.npx_installed?
+          spawn_chrome_headless_server_with_npx
+        else
+          spawn_chrome_from_path
+        end
 
       # Wait until the port is in use
       sleep 0.1 until port_in_use?

@@ -11,6 +11,7 @@ Palapala.setup do |config|
   # config.headless_chrome_url = 'http://localhost:9222'
   config.debug = debug
   config.defaults.merge! scale: 0.75, format: :A4
+  config.chrome_headless_shell_version = 'canary'
 end
 
 # @param concurrency Number of concurrent threads
@@ -34,17 +35,15 @@ end
 puts 'warmup'
 benchmark(1, 10)
 
-puts 'benchmarking 20 docs: 1x20, 2x10, 4x5, 5x4, 20x1'
-benchmark(1, 20)
+# benchmark(1, 20)
 benchmark(2, 10)
-benchmark(4, 5)
+# benchmark(4, 5)
 # benchmark(5, 4)
 # benchmark(20, 1)
 
-puts 'benchmarking 320 docs'
-benchmark(1, 320)
-benchmark(2, 320 / 2)
+# benchmark(1, 320)
+# benchmark(2, 320 / 2)
 benchmark(4, 320 / 4)
-benchmark(8, 320 / 8)
+# benchmark(8, 320 / 8)
 # benchmark(20, 2)
 # benchmark(40, 1)

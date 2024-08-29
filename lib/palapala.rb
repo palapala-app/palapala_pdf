@@ -21,10 +21,16 @@ module Palapala
 
     # URL to the headless Chrome instance when using the remote renderer
     attr_accessor :headless_chrome_url
-  end
 
+    # Chrome headless shell version to use
+    attr_accessor :chrome_headless_shell_version
+  end
+  puts "setting defaults on palapala"
   self.debug = false
   self.defaults = { displayHeaderFooter: true, encoding: :binary }
   self.headless_chrome_path = nil
   self.headless_chrome_url = "http://localhost:9222"
+  self.chrome_headless_shell_version = ENV.fetch("CHROME_HEADLESS_SHELL_VERSION", "stable")
 end
+
+puts "hoo"
