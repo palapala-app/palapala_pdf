@@ -22,6 +22,13 @@ module Palapala
       send_command_and_wait_for_result("Page.enable")
     end
 
+    def websocket_url
+      self.class.websocket_url
+    rescue Errno::ECONNREFUSED => e
+      ChromeProcess.spawn_chrome # Spawn a new Chrome process
+      self.class.websocket_url # Retry (once)
+    end
+
     # Create a thread-local instance of the renderer
     def self.thread_local_instance
       Thread.current[:renderer] ||= Renderer.new
@@ -102,16 +109,8 @@ module Palapala
       @client.close
     end
 
-    private
-
-    # Convert the HTML content to a data URL
-    def data_url_for_html(html)
-      "data:text/html;base64,#{Base64.strict_encode64(html)}"
-    end
-
     # Open a new tab in the remote chrome and return the WebSocket URL
-    def websocket_url
-      ChromeProcess.spawn_chrome
+    def self.websocket_url
       uri = URI("#{Palapala.headless_chrome_url}/json/new")
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Put.new(uri)
@@ -121,6 +120,13 @@ module Palapala
       websocket_url = tab_info["webSocketDebuggerUrl"]
       puts "WebSocket URL: #{websocket_url}" if Palapala.debug
       websocket_url
+    end
+
+    private
+
+    # Convert the HTML content to a data URL
+    def data_url_for_html(html)
+      "data:text/html;base64,#{Base64.strict_encode64(html)}"
     end
   end
 end

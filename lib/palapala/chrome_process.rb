@@ -25,9 +25,9 @@ module Palapala
       end
     end
 
-    # Check if a Chrome is running
+    # Check if a Chrome is running locally
     def self.chrome_running?
-      port_in_use? || # Check if the port is in use and Chrome is running externally
+      port_in_use? || # Check if the port is in use
       chrome_process_healthy? # Check if the process is still alive
     end
 
@@ -61,7 +61,7 @@ module Palapala
 
     def self.spawn_chrome_headless_server_with_npx
       # Run the command and capture the output
-      puts "Installing latest stable chrome-headless-shell..."
+      puts "Installing/launching chrome-headless-shell@#{Palapala.chrome_headless_shell_version}"
       output, status = Open3.capture2("npx --yes @puppeteer/browsers install chrome-headless-shell@#{Palapala.chrome_headless_shell_version}")
 
       if status.success?
@@ -82,11 +82,13 @@ module Palapala
         # Display the version
         system("#{chrome_path} --version") if Palapala.debug
         # Launch chrome-headless-shell with the --remote-debugging-port parameter
-        if Palapala.debug
+        pid = if Palapala.debug
           spawn(chrome_path, "--remote-debugging-port=9222", "--disable-gpu")
         else
           spawn(chrome_path, "--remote-debugging-port=9222", "--disable-gpu", out: "/dev/null", err: "/dev/null")
         end
+        Palapala.headless_chrome_url = "http://localhost:9222"
+        pid
       else
         raise "Failed to install chrome-headless-shell"
       end

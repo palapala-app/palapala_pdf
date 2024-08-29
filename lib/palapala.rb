@@ -25,12 +25,9 @@ module Palapala
     # Chrome headless shell version to use
     attr_accessor :chrome_headless_shell_version
   end
-  puts "setting defaults on palapala"
   self.debug = false
   self.defaults = { displayHeaderFooter: true, encoding: :binary }
   self.headless_chrome_path = nil
-  self.headless_chrome_url = "http://localhost:9222"
+  self.headless_chrome_url = ENV.fetch("HEADLESS_CHROME_URL", "http://localhost:9222")
   self.chrome_headless_shell_version = ENV.fetch("CHROME_HEADLESS_SHELL_VERSION", "stable")
 end
-
-puts "hoo"

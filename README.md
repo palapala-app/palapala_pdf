@@ -31,49 +31,47 @@ $ gem install palapala_pdf
 ```
 
 Palapala PDF connects to Chrome over a web socket connection.
-An external Chrome/Chromium is expected. Start it with the following
-command (9222 is the default port):
+An external Chrome/Chromium is preferred. Start it with the following
+command (9222 is the default/expected port):
 
 ```sh
 /path/to/chrome --headless --disable-gpu --remote-debugging-port=9222
 ```
 
-### Installing Chrome / Headless Chrome
+### Connecting to Chrome
 
-Seems the august 2024 release 128.0.6613.85 is seriously performance impacted. So to avoid regression issues, it's suggested to install a specific version of Chrome, test it and stick with it.  This is easiest using npx and some tooling provided by Puppeteer. Unfortunately it depends on node/npm, but it's worth it. E.g. install a specific version like this:
+Palapa PDF will go through this process
+
+- check if a Chrome is running and exposing port 9222 (and if so, use it)
+- if `Palapala.headless_chrome_path` is defined, launch Chrome as a child process using that path
+- if **NPX** is avalaillable, install a **Chrome-Headless-Shell** variant locally and launch it as a child process. It will install the 'stable' version or the version identified by `Palapala.chrome_headless_shell_version` setting (or from ENV `CHROME_HEADLESS_SHELL_VERSION`).
+- as a last fallback it will guess a chrome path from the detected OS and try to launch a Chrome with that
+
+A Chrome-Headless-Shell version gives the best performance and resource useage
+
+### Installing Chrome / Headless Chrome manually
+
+This is easiest using npx and some tooling provided by Puppeteer. Unfortunately it depends on node/npm, but it's worth it. E.g. install a specific version like this:
 
 ```
 npx @puppeteer/browsers install chrome@127.0.6533.88
 ````
 
-This installs chrome in a `chrome` folder in the current working dir and it outputs the path where it's installed when it's finished.
+This installs chrome in a `chrome` folder in the current working dir and it outputs the path where it's installed when it's finished which then could be started like this
 
-If you installed it using puppeteer from above
-
-```sh
-./chrome/mac_arm-127.0.6533.88/chrome-mac-arm64/Google\ Chrome\ for\ Testing.app/Contents/MacOS/Google\ Chrome\ for\ Testing --headless --disable-gpu --remote-debugging-port=9222
-```
-
-Currently i'd advise for the `chrome-headless-shell`variant that is a light version meant just for this use case. The chrome-headless-shell is a minimal, headless version of the Chrome browser designed specifically for environments where you need to run Chrome without a graphical user interface (GUI). This is particularly useful in scenarios like server-side rendering, automated testing, web scraping, or any situation where you need the power of the Chrome browser engine without the overhead of displaying a UI. Headless by design, reduced size and overhead but still the same engine.
+Currently we'd advise for the `chrome-headless-shell` variant that is a light version meant just for this use case. The chrome-headless-shell is a minimal, headless version of the Chrome browser designed specifically for environments where you need to run Chrome without a graphical user interface (GUI). This is particularly useful in scenarios like server-side rendering, automated testing, web scraping, or any situation where you need the power of the Chrome browser engine without the overhead of displaying a UI. Headless by design, reduced size and overhead but still the same engine.
 
 ```
 npx @puppeteer/browsers install chrome-headless-shell@stable
 ```
 
-It installs to a path like this `./chrome-headless-shell/mac_arm-128.0.6613.84/chrome-headless-shell-mac-arm64/chrome-headless-shell`. As it's headless by design, it only needs one parameter
+It installs to a path like this `./chrome-headless-shell/mac_arm-128.0.6613.84/chrome-headless-shell-mac-arm64/chrome-headless-shell`. As it's headless by design, it only needs one parameter:
 
 ```
 ./chrome-headless-shell/mac_arm-128.0.6613.84/chrome-headless-shell-mac-arm64/chrome-headless-shell --remote-debugging-port=9222
 ```
 
-Alternatively, Palapala PDF will try to launch Chrome as a child process.
-It guesses the path to Chrome, or you configure it like this:
-
-```ruby
-Palapala.setup do |config|
-  config.headless_chrome_path = '/usr/bin/google-chrome-stable' # path to Chrome executable
-end
-```
+*Note: Seems the august 2024 release 128.0.6613.85 is seriously performance impacted. So to avoid regression issues, it's suggested to install a specific version of Chrome, test it and stick with it. The chrome-headless-shell does not seem to suffer from this though.*
 
 ### Installing Node/NPX
 
@@ -91,7 +89,6 @@ source ~/.nvm/nvm.sh
 nvm --version
 nvm install node
 ````
-
 
 ## Usage Instructions
 
