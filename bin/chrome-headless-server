@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require 'open3'
+require 'pathname'
+
+# Run the command and capture the output
+puts "Installing latest stable chrome-headless-shell..."
+output, status = Open3.capture2('npx @puppeteer/browsers install chrome-headless-shell@stable')
+
+if status.success?
+  # Extract the path from the output
+  result = output.lines.find { |line| line.include?("chrome-headless-shell@") }
+  if result.nil?
+    puts "Failed to install chrome-headless-shell"
+    exit 1
+  end
+  _, chrome_path = result.split(' ', 2).map(&:strip)
+
+  # Directory you want the relative path from (current working directory)
+  base_dir = Dir.pwd
+
+  # Convert absolute path to relative path
+  relative_path = Pathname.new(chrome_path).relative_path_from(Pathname.new(base_dir)).to_s
+
+  puts "Launching chrome-headless-shell at #{relative_path}"
+  # Display the version
+  system("#{chrome_path} --version")
+  # Launch chrome-headless-shell with the --remote-debugging-port parameter
+  exec("#{chrome_path} --remote-debugging-port=9222")
+else
+  puts "Failed to install chrome-headless-shell"
+  exit 1
+end

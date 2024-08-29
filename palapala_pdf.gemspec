@@ -29,9 +29,8 @@ Gem::Specification.new do |spec|
         f.start_with?(*%w[bin/ test/ spec/ draft/ features/ .git appveyor Gemfile])
     end
   end
-  spec.bindir = 'exe'
-  spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
-  puts "spec.executables: #{spec.executables}"
+  spec.bindir = 'bin'
+  spec.executables = ['chrome-headless', 'chrome-headless-server']
   spec.require_paths = [ 'lib' ]
 
   # Uncomment to register a new dependency of your gem
