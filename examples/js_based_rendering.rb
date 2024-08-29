@@ -15,8 +15,9 @@ DOCUMENT = <<~HTML
 HTML
 
 Palapala.setup do |config|
-  config.debug = true
+  # config.debug = true
+  # config.defaults = { header_template: '<div></div>', footer_template: '<div></div>' }
 end
 
-result = Palapala::Pdf.new(DOCUMENT).save('tmp/js_based_rendering.pdf')
-puts result
+Palapala::Pdf.new(DOCUMENT).save('tmp/js_based_rendering.pdf')
+`open tmp/js_based_rendering.pdf`
