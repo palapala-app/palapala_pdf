@@ -45,7 +45,7 @@ $ gem install palapala_pdf
 
 #### Headers and Footers
 
-TODO
+TODO explain about headers and footers, font sizes, styles being independent, and how to insert current page, total pages, etc.
 
 #### Page sizes and margins
 
@@ -238,19 +238,7 @@ These properties help you control the layout of your printed documents or PDFs, 
 
 #### Tables accross Pages
 
-To ensure that table headers and footers repeat on every page in paged CSS, you can use the `display` property with the values `table-header-group` and `table-footer-group`.
-
-```css
-thead {
-  display: table-header-group;
-}
-
-tfoot {
-  display: table-footer-group;
-}
-```
-
-This ensures that the `<thead>` and `<tfoot>` sections of your table are repeated on every page where the table appears.
+TODO `display` property with the values `table-header-group` and `table-footer-group`
 
 ##### Example
 
