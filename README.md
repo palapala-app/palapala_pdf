@@ -4,7 +4,7 @@
 
 This project is a Ruby gem that provides functionality for generating PDF files from HTML using the Chrome browser. It allows you to easily convert HTML content into PDF documents, making it convenient for tasks such as generating reports, invoices, or any other printable documents. The gem provides a simple and intuitive API for converting HTML to PDF, and it leverages the power and flexibility of the Chrome browser's rendering engine to ensure accurate and high-quality PDF output. With this gem, you can easily integrate PDF generation capabilities into your Ruby applications.
 
-At the core, this project leverages the same rendering engine as [Grover](https://github.com/Studiosity/grover), but with significantly reduced overhead and dependencies. Instead of relying on the full Grover/Puppeteer/NodeJS stack, this project uses a raw web socket to enable direct communication from Ruby to a headless Chrome or Chromium browser. This approach ensures efficieny while providing a streamlined alternative for rendering tasks without sacrificing performance or flexibility.
+At the core, this project leverages the same rendering engine as [Grover](https://github.com/Studiosity/grover), but with significantly reduced overhead and dependencies. Instead of relying on the full Grover/Puppeteer/NodeJS stack, this project uses a raw web socket to enable direct communication from Ruby to a headless Chrome or Chromium browser. This approach ensures efficieny while providing a streamlined alternative for rendering tasks without sacrificing performance or flexibility. It leverages work from [Puppeteer](https://pptr.dev/browsers-api/) (@puppeteer/browsers) to install a local Chrome-Headless-Shell if no Chrome is running, but that requires node (npx) to be available.
 
 This is how easy PDF generation can be in Ruby:
 
@@ -30,14 +30,6 @@ If you are not using bundler to manage dependencies, you can install the gem by 
 $ gem install palapala_pdf
 ```
 
-Palapala PDF connects to Chrome over a web socket connection.
-An external Chrome/Chromium is preferred. Start it with the following
-command (9222 is the default/expected port):
-
-```sh
-/path/to/chrome --headless --disable-gpu --remote-debugging-port=9222
-```
-
 ### Connecting to Chrome
 
 Palapa PDF will go through this process
@@ -47,7 +39,7 @@ Palapa PDF will go through this process
 - if **NPX** is avalaillable, install a **Chrome-Headless-Shell** variant locally and launch it as a child process. It will install the 'stable' version or the version identified by `Palapala.chrome_headless_shell_version` setting (or from ENV `CHROME_HEADLESS_SHELL_VERSION`).
 - as a last fallback it will guess a chrome path from the detected OS and try to launch a Chrome with that
 
-A Chrome-Headless-Shell version gives the best performance and resource useage
+In our expreience a Chrome-Headless-Shell version gives the best performance and resource useage.
 
 ### Installing Chrome / Headless Chrome manually
 
@@ -77,18 +69,18 @@ It installs to a path like this `./chrome-headless-shell/mac_arm-128.0.6613.84/c
 
 Using Brew
 
-````
+```
 brew install node
 ```
 
 Using NVM (Node Version Manager)
 
-````
+```
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 source ~/.nvm/nvm.sh
 nvm --version
 nvm install node
-````
+```
 
 ## Usage Instructions
 
@@ -209,24 +201,14 @@ Your support is greatly appreciated and helps maintain the project!
 
 ## Primitive benchmark
 
-On a macbook m3, the throughput for 'hello world' PDF generation can reach around 300 docs/second when allowing for some concurrency. As Chrome is actually also very efficient, it scales really well for complex documents also. If you run this in Rails, the concurrency is being taken care of either by the front end thread pool or by the workers and you shouldn't have to think about this. (Using an external Chrome)
+On a macbook m3, the throughput for 'hello world' PDF generation can reach around 500 to 800 docs/second when allowing for some concurrency (4 threads). As Chrome is actually also very efficient, it scales really well for complex documents also. If you run this in Rails, the concurrency is being taken care of either by the front end thread pool or by the workers and you shouldn't have to think about this. (Using an external Chrome)
 
 Note: it renders `"Hello #{i}, world #{j}! #{Time.now}."` where i is the thread and j is the iteration counter within the thread and persists it to an SSD (which is very fast these days).
 
-### benchmarking 20 docs: 1x20, 2x10, 4x5
-
 ```sh
-c:1, n:20 : Throughput = 159.41 docs/sec, Total time = 0.1255 seconds
-c:2, n:10 : Throughput = 124.91 docs/sec, Total time = 0.1601 seconds
-c:4, n:5  : Throughput = 196.40 docs/sec, Total time = 0.1018 seconds
-```
-
-### benchmarking 320 docs: 1x320, 4x80, 8x40
-
-```sh
-c:1, n:320 : Throughput = 184.99 docs/sec, Total time = 1.7299 seconds
-c:4, n:80  : Throughput = 302.50 docs/sec, Total time = 1.0578 seconds
-c:8, n:40  : Throughput = 254.29 docs/sec, Total time = 1.2584 seconds
+c:1, n:10 : Throughput = 16.76 docs/sec, Total time = 0.5968 seconds
+c:2, n:10 : Throughput = 170.41 docs/sec, Total time = 0.1174 seconds
+c:4, n:80 : Throughput = 579.03 docs/sec, Total time = 0.5526 seconds```
 ```
 
 This is about a factor 100x faster then what you typically get with Grover and still 10x faster then with many alternatives. It's effectively that fast that you can run this for a lot of uses cases straight from e.g. your Ruby On Rails web worker in the controller on a single machine and still scale to lot's of users.
@@ -253,24 +235,21 @@ In this example, `pdf_data` is the binary data of the PDF file. The `filename` o
 
 ## Docker
 
-In docker as root you must pass the no-sandbox browser option:
+TODO
 
-```ruby
-Palapala.setup do |config|
-  config.opts = { 'no-sandbox': nil }
-end
-```
-It has also been reported that the Chrome process repeatedly crashes when running inside a Docker container on an M1 Mac. Chrome should work as expected when deployed to a Docker container on a non-M1 Mac.
+*It has also been reported that the Chrome process repeatedly crashes when running inside a Docker container on an M1 Mac. Chrome should work as expected when deployed to a Docker container on a non-M1 Mac.*
 
 ## Thread-safety
-
-Behind the scenes, a websocket is openend and stored on Thread.current for subsequent requests. Hence, the code is
-thread safe in the sense that every web socket get's a new tab in the underlying chromium and get an isolated context.
 
 For performance reasons, the code uses a low level websocket connection that does all it's work on the curent thread
 so we can avoid synchronisation penalties.
 
+Behind the scenes, a websocket is openend and stored on Thread.current for subsequent requests. Hence, the code is
+thread safe in the sense that every web socket get's a new tab in the underlying chromium and get an isolated context.
+
 ## Heroku
+
+TODO
 
 possible buildpacks
 
