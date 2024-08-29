@@ -42,20 +42,22 @@ module Palapala
                    scale: nil)
       @content = content || raise(ArgumentError, "Content is required and can't be nil")
       @opts = {}
-      @opts[:headerTemplate]    = header_template      || Palapala.defaults[:header_template]
-      @opts[:footerTemplate]    = footer_template      || Palapala.defaults[:footer_template]
-      @opts[:pageRanges]        = page_ranges          || Palapala.defaults[:page_ranges]
-      @opts[:generateTaggedPDF] = generate_tagged_pdf  || Palapala.defaults[:generate_tagged_pdf]
-      @opts[:paperWidth]        = paper_width          || Palapala.defaults[:paper_width]
-      @opts[:paperHeight]       = paper_height         || Palapala.defaults[:paper_height]
-      @opts[:landscape]         = landscape            || Palapala.defaults[:landscape]
-      @opts[:marginTop]         = margin_top           || Palapala.defaults[:margin_top]
-      @opts[:marginLeft]        = margin_left          || Palapala.defaults[:margin_left]
-      @opts[:marginBottom]      = margin_bottom        || Palapala.defaults[:margin_bottom]
-      @opts[:marginRight]       = margin_right         || Palapala.defaults[:margin_right]
-      @opts[:preferCSSPageSize] = prefer_css_page_size || Palapala.defaults[:prefer_css_page_size]
-      @opts[:printBackground]   = print_background     || Palapala.defaults[:print_background]
-      @opts[:scale]             = scale                || Palapala.defaults[:scale]
+      @opts[:headerTemplate]      = header_template      || Palapala.defaults[:header_template]
+      @opts[:footerTemplate]      = footer_template      || Palapala.defaults[:footer_template]
+      @opts[:pageRanges]          = page_ranges          || Palapala.defaults[:page_ranges]
+      @opts[:generateTaggedPDF]   = generate_tagged_pdf  || Palapala.defaults[:generate_tagged_pdf]
+      @opts[:paperWidth]          = paper_width          || Palapala.defaults[:paper_width]
+      @opts[:paperHeight]         = paper_height         || Palapala.defaults[:paper_height]
+      @opts[:landscape]           = landscape            || Palapala.defaults[:landscape]
+      @opts[:marginTop]           = margin_top           || Palapala.defaults[:margin_top]
+      @opts[:marginLeft]          = margin_left          || Palapala.defaults[:margin_left]
+      @opts[:marginBottom]        = margin_bottom        || Palapala.defaults[:margin_bottom]
+      @opts[:marginRight]         = margin_right         || Palapala.defaults[:margin_right]
+      @opts[:preferCSSPageSize]   = prefer_css_page_size || Palapala.defaults[:prefer_css_page_size]
+      @opts[:printBackground]     = print_background     || Palapala.defaults[:print_background]
+      @opts[:scale]               = scale                || Palapala.defaults[:scale]
+      @opts[:displayHeaderFooter] = true
+      @opts[:encoding]            = :binary
       @opts.compact!
     end
 
