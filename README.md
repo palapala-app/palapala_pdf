@@ -16,6 +16,15 @@ And this while having the most modern HTML/CSS/JS availlable to you: flex, grid,
 
 A core goal of this project is performance, and it is designed to be exceptionally fast. By leveraging **direct communication** with a headless Chrome or Chromium browser via a **raw web socket**, the gem minimizes overhead and dependencies, enabling PDF generation at speeds that significantly outperform other solutions. Whether generating simple or complex documents, this gem ensures that your Ruby applications can handle PDF tasks efficiently and at scale.
 
+## Sponsor This Project
+
+If you find this project useful and would like to support its development, consider sponsoring or buying a coffee to help keep it going:
+
+- **GitHub Sponsors:** [Sponsor on GitHub](https://github.com/sponsors/koenhandekyn)
+- **Buy Me a Coffee:** [Buy a Coffee](https://buymeacoffee.com/koenhandekyn)
+
+Your support is greatly appreciated and helps maintain the project!
+
 ## Installation
 
 To install the gem and add it to your application's Gemfile, execute the following command:
@@ -184,15 +193,6 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/palapa
 - [Kenneth Geerts](https://github.com/kennethgeerts) - Your foundational contributions to simplicity are greatly appreciated.
 - [Eugen Neagoe](https://github.com/eneagoe) - Thank you for your valuable input, feedback and opinions.
 - [Radu Bogoevici](https://github.com/codenighter) - Thanks for test driving, and all help big and small.
-
-## Sponsor This Project
-
-If you find this project useful and would like to support its development, consider sponsoring or buying a coffee to help keep it going:
-
-- **GitHub Sponsors:** [Sponsor on GitHub](https://github.com/sponsors/koenhandekyn)
-- **Buy Me a Coffee:** [Buy a Coffee](https://buymeacoffee.com/koenhandekyn)
-
-Your support is greatly appreciated and helps maintain the project!
 
 ## Findings
 
