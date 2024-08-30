@@ -27,12 +27,8 @@ module Palapala
     attr_accessor :chrome_headless_shell_version
   end
   self.debug = false
-  self.defaults = {
-    header_template: "<div></div>",
-    footer_template: "<div></div>"
-    # footer_template: '<div style="text-align: center; font-size: 12pt; width: 100%;">Generated with Palapala PDF</div>'
-  }
-  self.headless_chrome_path = nil
+  self.defaults = { print_background: true, prefer_css_page_size: true }
+  self.headless_chrome_path = ENV.fetch("HEADLESS_CHROME_PATH", nil)
   self.headless_chrome_url = ENV.fetch("HEADLESS_CHROME_URL", "http://localhost:9222")
   self.chrome_headless_shell_version = ENV.fetch("CHROME_HEADLESS_SHELL_VERSION", "stable")
 end

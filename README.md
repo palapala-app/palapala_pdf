@@ -53,34 +53,35 @@ In a Rails context, this could be inside an initializer.
 
 ```ruby
 Palapala.setup do |config|
-    # run against an external chrome/chromium or leave this out to run against a chrome that is started as a child process
+    # debug mode
     config.debug = true
-    config.headless_chrome_url = 'http://localhost:9222' # run against a remote Chrome instance
-    # config.headless_chrome_path = '/usr/bin/google-chrome-stable' # path to Chrome executable
-    config.defaults = { scale: 1, format: :A4 }
+    # Chrome headless shell version to use (stable, beta, dev, canary, etc.) when launching a new Chrome instance
+    config.chrome_headless_shell_version = :stable
+    # run against an external chrome/chromium or leave this out to run against a chrome that is started as a child process
+    config.headless_chrome_url = 'http://localhost:9222'
+    # path to Chrome executable
+    config.headless_chrome_path = '/usr/bin/google-chrome-stable'
+    # default options for PDF generation
+    config.defaults = { scale: 1 }
+    # extra params to pass to Chrome when launched as a child process
+    config.chrome_params = []
 end
 ```
 
-```ruby
-# params to pass to Chrome when launched as a child process
-attr_accessor :chrome_params
+*Using environemnt variables*
 
-# debug mode
-attr_accessor :debug
+```sh
+CHROME_HEADLESS_SHELL_VERSION=canary ruby examples/performance_benchmark.rb
+````
 
-# default options for PDF generation
-attr_accessor :defaults
-
-# path to the headless Chrome executable when using the child process renderer
-attr_accessor :headless_chrome_path
-
-# URL to the headless Chrome instance when using the remote renderer (priority)
-attr_accessor :headless_chrome_url
-
-# Chrome headless shell version to use (stable, beta, dev, canary, etc.)
-# when launching a new Chrome instance using npx
-attr_accessor :chrome_headless_shell_version
+```sh
+HEADLESS_CHROME_URL=http://192.168.1.1:9222 ruby examples/performance_benchmark.rb
 ```
+
+```sh
+CHROME_HEADLESS_PATH=/var/to/chrome ruby examples/performance_benchmark.rb
+````
+
 
 1. **Create a PDF from HTML**:
 
@@ -151,11 +152,13 @@ When using Chromium-based rendering engines, headers and footers are not control
 
 With palapala PDF headers and footers are defined using `header_template` and `footer_template` options. These allow you to insert HTML content directly into the header or footer areas.
 
+Critical is that you specify a font-size because by default Chrome uses a very tiny font.
+
 ```ruby
 Palapala::Pdf.new(
   "<p>Hello world</>",
-  header_template: '<div style="text-align: center;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>',
-  footer_template: '<div style="text-align: center;">Generated with Palapala PDF</div>',
+  header_template: '<div style="text-align: center; font-size: 12pt;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>',
+  footer_template: '<div style="text-align: center; font-size: 12pt;">Generated with Palapala PDF</div>',
 ).save("test.pdf")
 ```
 
@@ -213,7 +216,7 @@ Paged CSS allows you to control how content is divided across pages when printin
 - `left`: Forces a page break so that the next page is a left page.
 - `right`: Forces a page break so that the next page is a right page.
 
-##### Forcing a Page Break before or after an Element
+##### Examples
 
 ```css
 /* This ensures that every `h1` starts on a new page. */
@@ -238,7 +241,7 @@ table {
 
 #### Tables accross Pages
 
-TODO `display` property with the values `table-header-group` and `table-footer-group`
+TODO explain `display` property with the values `table-header-group` and `table-footer-group`
 
 ##### Example
 
@@ -272,7 +275,6 @@ In this example:
 
 ### Connecting to Chrome
 
-TODO
 
 Palapa PDF will go through this process
 
@@ -285,13 +287,11 @@ In our expreience a Chrome-Headless-Shell version gives the best performance and
 
 ### Installing Chrome / Headless Chrome manually
 
-This is easiest using npx and some tooling provided by Puppeteer. Unfortunately it depends on node/npm, but it's worth it. E.g. install a specific version like this:
+This is easiest using npx and tooling provided by Puppeteer (depends on node/npm, but it's worth it). This installs chrome in a `chrome` folder in the current working dir and it outputs the path where it's installed when it's finished.
 
 ```sh
 npx @puppeteer/browsers install chrome@127.0.6533.88
 ```
-
-This installs chrome in a `chrome` folder in the current working dir and it outputs the path where it's installed when it's finished which then could be started like this
 
 Currently we'd advise for the `chrome-headless-shell` variant that is a light version meant just for this use case. The chrome-headless-shell is a minimal, headless version of the Chrome browser designed specifically for environments where you need to run Chrome without a graphical user interface (GUI). This is particularly useful in scenarios like server-side rendering, automated testing, web scraping, or any situation where you need the power of the Chrome browser engine without the overhead of displaying a UI. Headless by design, reduced size and overhead but still the same engine.
 
@@ -307,7 +307,7 @@ It installs to a path like this `./chrome-headless-shell/mac_arm-128.0.6613.84/c
 
 *Note: Seems the august 2024 release 128.0.6613.85 is seriously performance impacted. So to avoid regression issues, it's suggested to install a specific version of Chrome, test it and stick with it. The chrome-headless-shell does not seem to suffer from this though.*
 
-### Installing Node/NPX
+### Installing Node (npx)
 
 Using Brew
 

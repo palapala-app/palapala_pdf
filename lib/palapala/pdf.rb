@@ -56,7 +56,7 @@ module Palapala
       @opts[:preferCSSPageSize]   = prefer_css_page_size || Palapala.defaults[:prefer_css_page_size]
       @opts[:printBackground]     = print_background     || Palapala.defaults[:print_background]
       @opts[:scale]               = scale                || Palapala.defaults[:scale]
-      @opts[:displayHeaderFooter] = true
+      @opts[:displayHeaderFooter] = (@opts[:headerTemplate] || @opts[:footerTemplate]) ? true : false
       @opts[:encoding]            = :binary
       @opts.compact!
     end

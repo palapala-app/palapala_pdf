@@ -44,6 +44,9 @@ module Palapala
     def on_message(e)
       puts "Received: #{e.data[0..64]}" if Palapala.debug
       @response = JSON.parse(e.data) # Parse the JSON response
+      if @response["error"] # Raise an error if the response contains an error
+        raise "#{@response["error"]["message"]}: #{@response["error"]["data"]} (#{@response["error"]["code"]})"
+      end
     end
 
     # Update the current ID to the next ID (increment by 1)
