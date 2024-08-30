@@ -154,8 +154,6 @@ header_template = header_footer_template do
   "Generated with Palapala PDF"
 end
 
-puts header_template
-
 Palapala::Pdf.new(document,
                   header_template:,
                   footer_template:,
@@ -166,4 +164,4 @@ Palapala::Pdf.new(document,
 
 puts "Generated paged_css.pdf"
 
-`open paged_css.pdf`
+# `open paged_css.pdf`
