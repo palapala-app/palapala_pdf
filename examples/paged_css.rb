@@ -35,9 +35,9 @@ document = <<~HTML
     <style>
       @page {
         size: A4;
-        margin: 1cm;
+        margin: 2cm;
         margin-top: 3cm;
-        margin-bottom: 2cm;
+        margin-bottom: 3cm;
       }
       body, html {
         margin: 0;
