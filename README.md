@@ -18,7 +18,7 @@ And this while having the most modern HTML/CSS/JS availlable to you: flex, grid,
 
 A core goal of this project is performance, and it is designed to be exceptionally fast. By leveraging **direct communication** with a headless Chrome or Chromium browser via a **raw web socket**, the gem minimizes overhead and dependencies, enabling PDF generation at speeds that significantly outperform other solutions. Whether generating simple or complex documents, this gem ensures that your Ruby applications can handle PDF tasks efficiently and at scale.
 
-[Example: paged_css.pdf](https://github.com/palapala-app/palapala_pdf/blob/main/examples/paged_css.pdf)
+[Example: paged_css.pdf](https://raw.githubusercontent.com/palapala-app/palapala_pdf/blob/main/examples/paged_css.pdf)
 
 ## Sponsor This Project
 
