@@ -35,17 +35,11 @@ To install the gem and add it to your application's Gemfile, execute the followi
 $ bundle add palapala_pdf
 ```
 
-If you are not using bundler to manage dependencies, you can install the gem by running:
-
-```
-$ gem install palapala_pdf
-```
-
 ## Usage Instructions
 
 To create a PDF from HTML content using the `Palapala` library, follow these steps:
 
-1. **Configuration**:
+**Configuration from inside Ruby**
 
 Configure the `Palapala` library with the necessary options, such as the URL for the browser and default settings like scale and format.
 
@@ -68,7 +62,7 @@ Palapala.setup do |config|
 end
 ```
 
-*Using environemnt variables*
+**Using environemnt variables**
 
 ```sh
 CHROME_HEADLESS_SHELL_VERSION=canary ruby examples/performance_benchmark.rb
@@ -82,8 +76,7 @@ HEADLESS_CHROME_URL=http://192.168.1.1:9222 ruby examples/performance_benchmark.
 CHROME_HEADLESS_PATH=/var/to/chrome ruby examples/performance_benchmark.rb
 ````
 
-
-1. **Create a PDF from HTML**:
+**Create a PDF from HTML**
 
 Create a PDF file from HTML in `irb`
 
@@ -91,7 +84,7 @@ Create a PDF file from HTML in `irb`
 gem install palapala_pdf
 ```
 
-in IRB, load palapala and create a PDF from an HTML snippet:
+Inside IRB, load palapala and create a PDF from an HTML snippet:
 
 ```ruby
 require "palapala"
@@ -105,176 +98,13 @@ require "palapala"
 binary_data = Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").binary_data
 ```
 
-## Paged CSS
+** See the examples directory for more advanced use cases **
 
-Paged CSS is a subset of CSS designed for styling printed documents. It extends standard CSS to handle pagination, page sizes, headers, footers, and other aspects of printed content. Paged CSS is commonly used in scenarios where web content needs to be converted to PDFs or other paginated formats.
-
-Setting page size
-
-```css
-@page {
-  /* set a standard page size */
-  size: A4 landscape;
-  /* Custom */
-  size: 8.5in 11in; /* Width x Height */
-}
-```
-
-Setting page margins
-
-```css
-@page {
-  margin: 1in; /* 1 inch on all sides */
-  margin: 1in 0.5in 1in 0.5in; /* Top, Right, Bottom, Left */
-}
-```
-
-Forcing a Page Break before or after an Element
-
-```css
-/* This ensures that every `h1` starts on a new page. */
-h1 {
-  page-break-before: always;
-}
-/* This ensures that every `p` element ends with a page break, starting the next content on a new page. */
-p {
-  page-break-after: always;
-}
-/* This prevents a table from being split across two pages. */
-table {
-  page-break-inside: avoid;
-}
-```
-
-### Headers and Footers
-
-When using Chromium-based rendering engines, headers and footers are not controlled by the Paged CSS standard but are instead managed through specific settings in the rendering engine.
-
-With palapala PDF headers and footers are defined using `header_template` and `footer_template` options. These allow you to insert HTML content directly into the header or footer areas.
-
-Critical is that you specify a font-size because by default Chrome uses a very tiny font.
-
-```ruby
-Palapala::Pdf.new(
-  "<p>Hello world</>",
-  header_template: '<div style="text-align: center; font-size: 12pt;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>',
-  footer_template: '<div style="text-align: center; font-size: 12pt;">Generated with Palapala PDF</div>',
-).save("test.pdf")
-```
-
-### Examples
-
-#### Headers and Footers
-
-TODO explain about headers and footers, font sizes, styles being independent, and how to insert current page, total pages, etc.
-
-#### Page sizes and margins
-
-Paged CSS, also known as @page CSS, is used to control the layout and appearance of printed documents. It allows you to define page-specific styles, such as sizes and margins, which are crucial for generating well-formatted PDFs.
-
-You can specify the size of the page using predefined sizes or custom dimensions. Common predefined sizes include A4, A3, letter, etc. Margins can be set for the top, right, bottom, and left sides of the page. You can specify all four margins at once or individually. You can also define named pages for different sections of your document.
-
-##### Example: Different First Page
-
-TODO Validate
-
-```css
-@page first {
-  size: A4;
-  margin: 2in; /* Larger margin for the first page */
-}
-
-@page {
-  size: A4;
-  margin: 1in;
-}
-
-body {
-  counter-reset: page;
-}
-
-body:first {
-  page: first;
-}
-```
-
-#### Page breaks
-
-Paged CSS allows you to control how content is divided across pages when printing or generating PDFs. Page breaks are an essential part of this, as they determine where a new page starts. You can control page breaks using the `page-break-before`, `page-break-after`, and `page-break-inside` properties.
-
-##### Page Break Properties
-
-1. **`page-break-before`**: Forces a page break before the element.
-2. **`page-break-after`**: Forces a page break after the element.
-3. **`page-break-inside`**: Prevents or allows a page break inside the element.
-
-##### Values
-
-- `auto`: Default. Neither forces nor prevents a page break.
-- `always` Always forces a page break.
-- `avoid`: Avoids a page break inside the element.
-- `left`: Forces a page break so that the next page is a left page.
-- `right`: Forces a page break so that the next page is a right page.
-
-##### Examples
-
-```css
-/* This ensures that every `h1` starts on a new page. */
-h1 {
-  page-break-before: always;
-}
-/* This ensures that every `p` element ends with a page break, starting the next content on a new page. */
-p {
-  page-break-after: always;
-}
-/* This prevents a table from being split across two pages. */
-table {
-  page-break-inside: avoid;
-}
-```
-
-##### Practical Use Cases
-
-- **Chapter Titles**: Use `page-break-before: always;` for chapter titles to ensure each chapter starts on a new page.
-- **Sections**: Use `page-break-after: always;` for sections that should end with a page break.
-- **Tables and Figures**: Use `page-break-inside: avoid;` to keep tables and figures from being split across pages.
-
-#### Tables accross Pages
-
-TODO explain `display` property with the values `table-header-group` and `table-footer-group`
-
-##### Example
-
-```html
-<table>
-  <thead>
-    <tr>
-      <th>Header 1</th>
-      <th>Header 2</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Data 1</td>
-      <td>Data 2</td>
-    </tr>
-    <!-- More rows -->
-  </tbody>
-  <tfoot>
-    <tr>
-      <td>Footer 1</td>
-      <td>Footer 2</td>
-    </tr>
-  </tfoot>
-</table>
-```
-
-In this example:
-- The `<thead>` section will be repeated at the top of each page.
-- The `<tfoot>` section will be repeated at the bottom of each page.
+- headers and footers
+- paged css for paper sizes, paper margins, pages breaks, etc
+- js based rendering
 
 ### Connecting to Chrome
-
 
 Palapa PDF will go through this process
 
@@ -287,13 +117,7 @@ In our expreience a Chrome-Headless-Shell version gives the best performance and
 
 ### Installing Chrome / Headless Chrome manually
 
-This is easiest using npx and tooling provided by Puppeteer (depends on node/npm, but it's worth it). This installs chrome in a `chrome` folder in the current working dir and it outputs the path where it's installed when it's finished.
-
-```sh
-npx @puppeteer/browsers install chrome@127.0.6533.88
-```
-
-Currently we'd advise for the `chrome-headless-shell` variant that is a light version meant just for this use case. The chrome-headless-shell is a minimal, headless version of the Chrome browser designed specifically for environments where you need to run Chrome without a graphical user interface (GUI). This is particularly useful in scenarios like server-side rendering, automated testing, web scraping, or any situation where you need the power of the Chrome browser engine without the overhead of displaying a UI. Headless by design, reduced size and overhead but still the same engine.
+This is easiest using npx and tooling provided by Puppeteer (depends on node/npm, but it's worth it). This installs chrome in a `chrome` folder in the current working dir and it outputs the path where it's installed when it's finished. Currently we'd advise for the `chrome-headless-shell` variant that is a light version meant just for this use case. The chrome-headless-shell is a minimal, headless version of the Chrome browser designed specifically for environments where you need to run Chrome without a graphical user interface (GUI). This is particularly useful in scenarios like server-side rendering, automated testing, web scraping, or any situation where you need the power of the Chrome browser engine without the overhead of displaying a UI. Headless by design, reduced size and overhead but still the same engine.
 
 ```sh
 npx @puppeteer/browsers install chrome-headless-shell@stable
@@ -304,38 +128,7 @@ It installs to a path like this `./chrome-headless-shell/mac_arm-128.0.6613.84/c
 ```sh
 ./chrome-headless-shell/mac_arm-128.0.6613.84/chrome-headless-shell-mac-arm64/chrome-headless-shell --remote-debugging-port=9222
 ```
-
-*Note: Seems the august 2024 release 128.0.6613.85 is seriously performance impacted. So to avoid regression issues, it's suggested to install a specific version of Chrome, test it and stick with it. The chrome-headless-shell does not seem to suffer from this though.*
-
-### Installing Node (npx)
-
-Using Brew
-
-```sh
-brew install node
-```
-
-Using NVM (Node Version Manager)
-
-```sh
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-source ~/.nvm/nvm.sh
-nvm --version
-nvm install node
-```
-
-## JS based rendering
-
-```html
-  <html>
-    <script type="text/javascript">
-      document.addEventListener("DOMContentLoaded", () => {
-        document.body.innerHTML += "<p>Current time from JS: " + new Date().toLocaleString() + "</p>";
-      });
-    </script>
-    <body><p>Default body text.</p></body>
-  </html>
-```
+*Note: Seems the august 2024 release Chrome releases 128.0.6613.85 onward is seriously performance impacted for PDF generation. Chrome Headless Shell releases don't seem to suffer from this issue.
 
 ## Raw parameters (Page.printToPDF)
 

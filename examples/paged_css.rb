@@ -69,7 +69,8 @@ document = <<~HTML
         width: 100vw;
       }
       table {
-        width: calc(100% - 1px);
+        font-size: 10pt;
+        width: 100%;
         border-collapse: collapse;
         td, th {
           border: 1px solid black;
@@ -106,7 +107,17 @@ document = <<~HTML
         content: counter(h1Counter) "." counter(h2Counter) " ";
         /* font-weight: bold; */
       }
-    </style>
+      /* named pages */
+      @page addendum {
+        size: A5;
+        margin: 1cm;
+        margin-top: 3cm;
+      }
+      .addendum {
+        page: addendum;
+        counter-reset: h1Counter h2Counter;
+      }
+  </style>
     <body>
       <div class="titlepage">
         <c-title>Title Page</c-title>
@@ -128,6 +139,14 @@ document = <<~HTML
       <p>Some content</p>
       <h2>Subsection</h2>
       <p>Some content</p>
+      <div class="addendum">
+        This is an addendum and the page size is A5.
+        Headers are starting again from 1.
+        <h1>Some addendum header</h1>
+        <h2>Subsection</h2>
+        <h2>Subsection</h2>
+        <h1>Some addendum header</h1>
+      </div>
     </body>
   </html>
 HTML
@@ -164,4 +183,4 @@ Palapala::Pdf.new(document,
 
 puts "Generated paged_css.pdf"
 
-`open paged_css.pdf`
+# `open paged_css.pdf`
