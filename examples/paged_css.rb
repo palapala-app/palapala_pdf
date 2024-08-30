@@ -132,9 +132,6 @@ document = <<~HTML
   </html>
 HTML
 
-header_template =
-  '<div style="text-align: center; font-size: 12pt; padding: 1rem; width: 100%; background-color: yellow; color: blue;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>'
-
 def debug(color: "red")
   <<~HTML
     <style>
@@ -163,11 +160,7 @@ end
 
 Palapala::Pdf.new(document,
                   header_template:,
-                  footer_template:,
-                  margin_left: 0,
-                  margin_right: 0,
-                  margin_top: 0,
-                  margin_bottom: 0).save("paged_css.pdf")
+                  footer_template:).save("paged_css.pdf")
 
 puts "Generated paged_css.pdf"
 

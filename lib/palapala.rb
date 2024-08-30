@@ -27,7 +27,7 @@ module Palapala
     attr_accessor :chrome_headless_shell_version
   end
   self.debug = false
-  self.defaults = { print_background: true, prefer_css_page_size: true }
+  self.defaults = { print_background: true, prefer_css_page_size: true, margin_left: 0, margin_right: 0, margin_top: 0, margin_bottom: 0 }
   self.headless_chrome_path = ENV.fetch("HEADLESS_CHROME_PATH", nil)
   self.headless_chrome_url = ENV.fetch("HEADLESS_CHROME_URL", "http://localhost:9222")
   self.chrome_headless_shell_version = ENV.fetch("CHROME_HEADLESS_SHELL_VERSION", "stable")
