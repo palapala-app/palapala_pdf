@@ -74,37 +74,31 @@ HEADLESS_CHROME_URL=http://192.168.1.1:9222 ruby examples/performance_benchmark.
 
 ```sh
 CHROME_HEADLESS_PATH=/var/to/chrome ruby examples/performance_benchmark.rb
-````
+```
 
 **Create a PDF from HTML**
 
-Create a PDF file from HTML in `irb`
-
-```sh
-gem install palapala_pdf
-```
-
-Inside IRB, load palapala and create a PDF from an HTML snippet:
+Load palapala and create a PDF file from an HTML snippet:
 
 ```ruby
 require "palapala"
 Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").save('hello.pdf')
 ```
 
-Instantiate a new Palapala::Pdf object with your HTML content and generate the PDF binary data.
+Instantiate a new Palapala::Pdf object with your HTML content and generate the PDF binary data:
 
 ```ruby
 require "palapala"
 binary_data = Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").binary_data
 ```
 
-** See the examples directory for more advanced use cases **
+## Advanced Examples
 
 - headers and footers
 - paged css for paper sizes, paper margins, pages breaks, etc
 - js based rendering
 
-### Connecting to Chrome
+## Connecting to Chrome
 
 Palapa PDF will go through this process
 
