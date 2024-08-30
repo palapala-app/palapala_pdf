@@ -53,7 +53,7 @@ document = <<~HTML
         page-break-after: avoid;
       }
       @page:first {
-        size: A4;
+        size: A4 landscape;
         margin: 0; /* no margin for the first page */
         padding: 0;
       }
