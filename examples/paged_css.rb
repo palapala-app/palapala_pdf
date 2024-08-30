@@ -5,25 +5,30 @@ require "palapala"
 
 long_text = (1..30).map { "Demonstrate a paragraph that is not split across pages." }.join(" ")
 
-big_table = <<~HTML
-<table>
-  <thead>
-    <tr>
-      <th>Header 1</th>
-      <th>Header 2</th>
-    </tr>
-  </thead>
-  <tbody>
-  #{ (1..40).map { |i| "<tr><td>Row #{i}, Cell 1</td><td>Row #{i}, Cell 2</td></tr>" }.join }
-  </tbody>
-  <tfoot>
-    <tr>
-      <td>Footer 1</td>
-      <td>Footer 2</td>
-    </tr>
-  </tfoot>
-</table>
-HTML
+def table(rows)
+  <<~HTML
+  <table>
+    <thead>
+      <tr>
+        <th>Header 1</th>
+        <th>Header 2</th>
+      </tr>
+    </thead>
+    <tbody>
+    #{ (1..rows).map { |i| "<tr><td>Row #{i}, Cell 1</td><td>Row #{i}, Cell 2</td></tr>" }.join }
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>Footer 1</td>
+        <td>Footer 2</td>
+      </tr>
+    </tfoot>
+  </table>
+  HTML
+end
+
+big_table = table(35)
+small_table = table(5)
 
 document = <<~HTML
   <html>
@@ -117,6 +122,8 @@ document = <<~HTML
       <p>Note that the section title has moved to the second page because the paragraph above was moved to the second page.</p>
       <h1>New Section</h1>
       <p>Page 3 content</p>
+      <p>A small table</p>
+      #{small_table}
       <h2>Subsection</h2>
       <p>Some content</p>
       <h2>Subsection</h2>
@@ -164,4 +171,4 @@ Palapala::Pdf.new(document,
 
 puts "Generated paged_css.pdf"
 
-# `open paged_css.pdf`
+`open paged_css.pdf`
