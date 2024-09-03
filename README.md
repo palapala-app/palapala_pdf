@@ -75,7 +75,7 @@ HEADLESS_CHROME_URL=http://192.168.1.1:9222 ruby examples/performance_benchmark.
 ```
 
 ```sh
-CHROME_HEADLESS_PATH=/var/to/chrome ruby examples/performance_benchmark.rb
+HEADLESS_CHROME_PATH=/var/to/chrome ruby examples/performance_benchmark.rb
 ```
 
 **Create a PDF from HTML**
@@ -189,7 +189,29 @@ In this example, `pdf_data` is the binary data of the PDF file. The `filename` o
 
 TODO
 
-*It has also been reported that the Chrome process repeatedly crashes when running inside a Docker container on an M1 Mac. Chrome should work as expected when deployed to a Docker container on a non-M1 Mac.*
+```Dockerfile
+# Install Nodejs and Chromium, to import the chrome headless shell dependencies easily (chrome itself is not used)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install --no-install-recommends -y nodejs chromium && \
+    rm -rf /var/lib/apthet/lists /var/cache/apt/archives
+
+# Install Chrome Headless Shell
+RUN npx --yes @puppeteer/browsers install chrome-headless-shell@stable
+```
+
+Use a script like the below, to launch chrome headless shell from e.g. docker entrypoint script.
+
+*launch_chrome_headless_shell.rb*
+
+```sh
+#!/bin/bash
+# find the installation path of chrome headless shell (latest version)
+export CHROME_PATH=$(npx --yes @puppeteer/browsers install chrome-headless-shell@stable | awk '{print $2}')
+# start chrome headless with remote debugging on
+$CHROME_PATH --disable-gpu --remote-debugging-port=9222 --disable-software-rasterizer --disable-bluetooth --no-sandbox
+```
+
+*It has also been reported that the Chrome process repeatedly crashes when running inside a Docker container on an M1 Mac. Chrome should work asexpected when deployed to a Docker container on a non-M1 Mac.*
+
 
 ## Thread-safety
 
@@ -203,12 +225,40 @@ thread safe in the sense that every web socket get's a new tab in the underlying
 
 TODO
 
-possible buildpacks
+This buildpack installs chrome and chromedriver (chromedriver is actually not needed, but it's maintained)
 
-https://github.com/heroku/heroku-buildpack-chrome-for-testing
-
-this buildpack install chrome and chromedriver, which is actually not needed, but it's maintained
-
+```sh
 https://elements.heroku.com/buildpacks/heroku/heroku-buildpack-google-chrome
+```
 
-this buildpack installs chrome, which is all we need, but it's deprecated
+### launch as child process
+
+set `HEADLESS_CHROME_PATH=chrome` as an ENV variable as this buildpacks adds `chrome` to the path.
+
+### run seperately
+
+In your `Procfile` adjust the web worker command
+
+```yaml
+web: bin/start
+```
+
+Create a bin/start script
+
+```sh
+#!/bin/bash
+# Start Rails app
+bundle exec rails server -p $PORT -e $RAILS_ENV &
+
+# Start the background app
+command_to_start_your_background_app &
+
+# Wait for all processes to finish
+wait -n
+```
+
+ensure the script is executable
+
+```sh
+chmod +x bin/start
+```
