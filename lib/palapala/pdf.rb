@@ -43,7 +43,8 @@ module Palapala
                    paper_width: nil,
                    prefer_css_page_size: nil,
                    print_background: nil,
-                   scale: nil)
+                   scale: nil,
+                   watermark: nil)
       @content = content || raise(ArgumentError, "Content is required and can't be nil")
       @opts = {}
       raise(ArgumentError, "Either footer or footer_template is expected") if !footer_template.nil? && !footer.nil?
@@ -62,9 +63,27 @@ module Palapala
       @opts[:preferCSSPageSize]   = prefer_css_page_size || Palapala.defaults[:prefer_css_page_size]
       @opts[:printBackground]     = print_background     || Palapala.defaults[:print_background]
       @opts[:scale]               = scale                || Palapala.defaults[:scale]
+      @opts[:headerTemplate]      = (@opts[:headerTemplate].to_s + watermark(watermark)) if watermark
       @opts[:displayHeaderFooter] = (@opts[:headerTemplate] || @opts[:footerTemplate]) ? true : false
       @opts[:encoding]            = :binary
       @opts.compact!
+    end
+
+    def watermark(watermark, angle: "-15deg", color: "rgba(25,25,25,0.25)")
+      <<~HTML
+        <style>
+          .palapala_pdf_watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(#{angle});
+            font-size: 8em;
+            color: #{color};
+            z-index: 9999;
+          }
+        </style>
+        <span class="palapala_pdf_watermark">#{watermark}</span>
+      HTML
     end
 
     def hf_template(from:)

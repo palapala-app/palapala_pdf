@@ -97,6 +97,7 @@ binary_data = Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").binary_dat
 ## Advanced Examples
 
 - headers and footers
+- watermark
 - paged css for paper sizes, paper margins, pages breaks, etc
 - js based rendering
 

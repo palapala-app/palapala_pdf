@@ -23,7 +23,8 @@ Palapala::Pdf.new(
   footer:,
   margin_top: 1,
   margin_left: 1,
-  margin_bottom: 1).save('headers_and_footers.pdf')
+  margin_bottom: 1,
+  watermark: "DRAFT").save('headers_and_footers.pdf')
 
 puts "Generated headers_and_footers.pdf"
 # `open headers_and_footers.pdf`
