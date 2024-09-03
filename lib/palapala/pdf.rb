@@ -12,8 +12,10 @@ module Palapala
     #
     # @param content [String] the HTML content to convert to PDF
     # @param footer_html [String] the HTML content for the footer
+    # @param footer [String] the footer content that is centered
     # @param generate_tagged_pdf [Boolean] whether to generate a tagged PDF
     # @param header_html [String] the HTML content for the header
+    # @param header [String] the header content that is centered
     # @param landscape [Boolean] whether to use landscape orientation
     # @param margin_bottom [Integer] the bottom margin in inches
     # @param margin_left [Integer] the left margin in inches
@@ -27,8 +29,10 @@ module Palapala
     # @param scale [Float] the scale of the PDF rendering
     def initialize(content,
                    footer_template: nil,
+                   footer: nil,
                    generate_tagged_pdf: nil,
                    header_template: nil,
+                   header: nil,
                    landscape: nil,
                    margin_bottom: nil,
                    margin_left: nil,
@@ -42,8 +46,10 @@ module Palapala
                    scale: nil)
       @content = content || raise(ArgumentError, "Content is required and can't be nil")
       @opts = {}
-      @opts[:headerTemplate]      = header_template      || Palapala.defaults[:header_template]
-      @opts[:footerTemplate]      = footer_template      || Palapala.defaults[:footer_template]
+      raise(ArgumentError, "Either footer or footer_template is expected") if !footer_template.nil? && !footer.nil?
+      raise(ArgumentError, "Either header or header_template is expected") if !header_template.nil? && !header.nil?
+      @opts[:headerTemplate]      = header_template      || hf_template(from: header) || Palapala.defaults[:header_template]
+      @opts[:footerTemplate]      = footer_template      || hf_template(from: footer) || Palapala.defaults[:footer_template]
       @opts[:pageRanges]          = page_ranges          || Palapala.defaults[:page_ranges]
       @opts[:generateTaggedPDF]   = generate_tagged_pdf  || Palapala.defaults[:generate_tagged_pdf]
       @opts[:paperWidth]          = paper_width          || Palapala.defaults[:paper_width]
@@ -59,6 +65,20 @@ module Palapala
       @opts[:displayHeaderFooter] = (@opts[:headerTemplate] || @opts[:footerTemplate]) ? true : false
       @opts[:encoding]            = :binary
       @opts.compact!
+    end
+
+    def hf_template(from:)
+      return if from.nil?
+      style = <<~HTML.freeze
+        <style>
+          #header, #footer {
+            font-size: 10pt;
+            display: flex;
+            justify-content: center;
+          }
+        </style>
+      HTML
+      style + from
     end
 
     # Render the PDF content to a binary string.

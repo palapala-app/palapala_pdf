@@ -43,7 +43,7 @@ document = <<~HTML
         margin: 0;
         padding: 0;
         font-family: Arial, sans-serif;
-        background-color: yellow;
+        /* background-color: yellow; */
       }
       h1 {
         page-break-before: always;
@@ -166,21 +166,21 @@ end
 def header_footer_template(debug_color: nil)
   <<~HTML
   #{ debug(color: debug_color) if debug_color }
-  <div style="text-align: center; font-size: 12pt; padding: 1rem; width: 100%;">#{yield}</div>
+  <div style="font-size: 12pt;">#{yield}</div>
   HTML
 end
 
-footer_template = header_footer_template do
+footer = header_footer_template do
   "Page <span class='pageNumber'></span> of <span class='totalPages'></span>"
 end
 
-header_template = header_footer_template do
+header = header_footer_template do
   "Generated with Palapala PDF"
 end
 
 Palapala::Pdf.new(document,
-                  header_template:,
-                  footer_template:).save("paged_css.pdf")
+                  header:,
+                  footer:).save("paged_css.pdf")
 
 puts "Generated paged_css.pdf"
 
