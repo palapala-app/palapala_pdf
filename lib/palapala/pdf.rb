@@ -1,4 +1,5 @@
 require_relative "./renderer"
+require_relative "./helper"
 
 module Palapala
   # Page class to generate PDF from HTML content using Chrome in headless mode in a thread-safe way
@@ -49,8 +50,8 @@ module Palapala
       @opts = {}
       raise(ArgumentError, "Either footer or footer_template is expected") if !footer_template.nil? && !footer.nil?
       raise(ArgumentError, "Either header or header_template is expected") if !header_template.nil? && !header.nil?
-      @opts[:headerTemplate]      = header_template      || hf_template(from: header) || Palapala.defaults[:header_template]
-      @opts[:footerTemplate]      = footer_template      || hf_template(from: footer) || Palapala.defaults[:footer_template]
+      @opts[:headerTemplate]      = header_template      || Helper.hf_template(from: header) || Palapala.defaults[:header_template]
+      @opts[:footerTemplate]      = footer_template      || Helper.hf_template(from: footer) || Palapala.defaults[:footer_template]
       @opts[:pageRanges]          = page_ranges          || Palapala.defaults[:page_ranges]
       @opts[:generateTaggedPDF]   = generate_tagged_pdf  || Palapala.defaults[:generate_tagged_pdf]
       @opts[:paperWidth]          = paper_width          || Palapala.defaults[:paper_width]
@@ -63,41 +64,12 @@ module Palapala
       @opts[:preferCSSPageSize]   = prefer_css_page_size || Palapala.defaults[:prefer_css_page_size]
       @opts[:printBackground]     = print_background     || Palapala.defaults[:print_background]
       @opts[:scale]               = scale                || Palapala.defaults[:scale]
-      @opts[:headerTemplate]      = (@opts[:headerTemplate].to_s + watermark(watermark)) if watermark
+      @opts[:headerTemplate]      = (@opts[:headerTemplate].to_s + Helper.watermark(watermark)) if watermark
       @opts[:displayHeaderFooter] = (@opts[:headerTemplate] || @opts[:footerTemplate]) ? true : false
+      @opts[:headerTemplate]    ||= "&nbsp;" if @opts[:displayHeaderFooter]
+      @opts[:footerTemplate]    ||= "&nbsp;" if @opts[:displayHeaderFooter]
       @opts[:encoding]            = :binary
       @opts.compact!
-    end
-
-    def watermark(watermark, angle: "-15deg", color: "rgba(25,25,25,0.25)", font_size: "72pt")
-      <<~HTML
-        <style>
-          .palapala_pdf_watermark {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(#{angle});
-            font-size: #{font_size};
-            color: #{color};
-            z-index: 9999;
-          }
-        </style>
-        <span class="palapala_pdf_watermark">#{watermark}</span>
-      HTML
-    end
-
-    def hf_template(from:)
-      return if from.nil?
-      style = <<~HTML.freeze
-        <style>
-          #header, #footer {
-            font-size: 10pt;
-            display: flex;
-            justify-content: center;
-          }
-        </style>
-      HTML
-      style + from
     end
 
     # Render the PDF content to a binary string.

@@ -1,4 +1,5 @@
 require_relative "palapala/pdf"
+require_relative "palapala/helper"
 require_relative "palapala/version"
 
 module Palapala
