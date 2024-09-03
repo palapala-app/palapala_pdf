@@ -69,7 +69,7 @@ module Palapala
       @opts.compact!
     end
 
-    def watermark(watermark, angle: "-15deg", color: "rgba(25,25,25,0.25)")
+    def watermark(watermark, angle: "-15deg", color: "rgba(25,25,25,0.25)", font_size: "72pt")
       <<~HTML
         <style>
           .palapala_pdf_watermark {
@@ -77,7 +77,7 @@ module Palapala
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(#{angle});
-            font-size: 72pt;
+            font-size: #{font_size};
             color: #{color};
             z-index: 9999;
           }

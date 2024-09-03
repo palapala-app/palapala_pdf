@@ -24,7 +24,7 @@ Palapala::Pdf.new(
   margin_top: 1,
   margin_left: 1,
   margin_bottom: 1,
-  watermark: "DRAFT").save('headers_and_footers.pdf')
+  watermark: "CLASSIFIED").save('headers_and_footers.pdf')
 
 puts "Generated headers_and_footers.pdf"
 # `open headers_and_footers.pdf`
