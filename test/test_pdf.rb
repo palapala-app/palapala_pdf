@@ -5,11 +5,6 @@ require "benchmark"
 
 class TestPdf < Minitest::Test
   def setup
-    Palapala.setup do |config|
-      config.headless_chrome_url = "http://localhost:9222"
-      # config.headless_chrome_path = "/usr/bin/google-chrome-stable"
-      config.defaults.merge! scale: 1, format: :A4
-    end
   end
 
   def test_create_pdf_from_html

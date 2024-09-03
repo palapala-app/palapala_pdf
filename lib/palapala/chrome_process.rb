@@ -82,7 +82,7 @@ module Palapala
         # Display the version
         system("#{chrome_path} --version") if Palapala.debug
         # Launch chrome-headless-shell with the --remote-debugging-port parameter
-        params = [ "--disable-gpu", "--remote-debugging-port=9222" ]
+        params = [ "--disable-gpu", "--remote-debugging-port=9222", "--remote-debugging-address=0.0.0.0" ]
         params.merge!(Palapala.chrome_params) if Palapala.chrome_params
         pid = if Palapala.debug
           spawn(chrome_path, *params)

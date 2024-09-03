@@ -103,8 +103,20 @@ module Palapala
       Base64.decode64(result["data"])
     end
 
+    def ping
+      result = send_command_and_wait_for_result("Runtime.evaluate", params: { expression: "1 + 1" })
+      raise "Ping failed" unless result["result"]["value"] == 2
+    end
+
     def self.html_to_pdf(html, params: {})
       thread_local_instance.html_to_pdf(html, params: params)
+    rescue StandardError
+      reset # Reset the renderer on error, the websocket connection might be broken
+      thread_local_instance.html_to_pdf(html, params: params) # Retry (once)
+    end
+
+    def self.ping
+      thread_local_instance.ping
     end
 
     def close

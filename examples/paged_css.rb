@@ -43,6 +43,7 @@ document = <<~HTML
         margin: 0;
         padding: 0;
         font-family: Arial, sans-serif;
+        background-color: yellow;
       }
       h1 {
         page-break-before: always;
