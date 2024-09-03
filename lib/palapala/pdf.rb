@@ -77,7 +77,7 @@ module Palapala
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(#{angle});
-            font-size: 8em;
+            font-size: 72pt;
             color: #{color};
             z-index: 9999;
           }
