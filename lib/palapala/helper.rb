@@ -13,7 +13,7 @@ module Palapala
     def self.footer(left: "", center: "", right: "", margin: "1cm")
       self.header(left:, center:, right:, margin:)
     end
-``
+
     def self.page_number
       <<~HTML
         <span class="pageNumber"></span>/<span class="totalPages"></span>
