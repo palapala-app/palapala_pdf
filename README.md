@@ -229,22 +229,22 @@ TODO
 This buildpack installs chrome and chromedriver (chromedriver is actually not needed, but at least the buildpack is maintained)
 
 ```sh
-https://elements.heroku.com/buildpacks/heroku/heroku-buildpack-google-chrome
+https://github.com/heroku/heroku-buildpack-chrome-for-testing
 ```
 
 ### launch as child process
 
-set `HEADLESS_CHROME_PATH=chrome` as an ENV variable as this buildpacks adds `chrome` to the path.
+This is the current default. If HEROKU is detected, then we set `HEADLESS_CHROME_PATH=chrome` as an ENV variable as the above buildpack adds `chrome` to the path. Basically it should run out of the box as long as the buildpack is added.
 
 ### run seperately
 
-In your `Procfile` adjust the web worker command
+If you prefer to run it next to your Rails app, then in your `Procfile` adjust the web worker command to
 
 ```yaml
 web: bin/start
 ```
 
-Create a bin/start script
+And create a bin/start script
 
 ```sh
 #!/bin/bash
@@ -258,7 +258,7 @@ command_to_start_your_background_app &
 wait -n
 ```
 
-ensure the script is executable
+Ensure the script is executable
 
 ```sh
 chmod +x bin/start
