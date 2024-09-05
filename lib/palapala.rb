@@ -38,4 +38,8 @@ module Palapala
     self.chrome_params ||= []
     self.chrome_params << "--no-sandbox"
   end
+
+  if !ENV["DYNO"].nil?
+    self.headless_chrome_path = "chrome"
+  end
 end
