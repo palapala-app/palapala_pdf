@@ -32,4 +32,10 @@ module Palapala
   self.headless_chrome_path = ENV.fetch("HEADLESS_CHROME_PATH", nil)
   self.headless_chrome_url = ENV.fetch("HEADLESS_CHROME_URL", "http://localhost:9222")
   self.chrome_headless_shell_version = ENV.fetch("CHROME_HEADLESS_SHELL_VERSION", "stable")
+  self.chrome_params = ENV.fetch("HEADLESS_CHROME_PARAMS", nil)&.split || []
+
+  if !ENV["DYNO"].nil? || File.exist?('/.dockerenv')
+    self.chrome_params ||= []
+    self.chrome_params << "--no-sandbox"
+  end
 end
