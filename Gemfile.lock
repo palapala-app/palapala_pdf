@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    palapala_pdf (0.1.20)
+    palapala_pdf (0.1.21)
       base64 (~> 0)
       combine_pdf (~> 1)
       websocket-driver (~> 0)
