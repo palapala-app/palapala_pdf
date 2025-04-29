@@ -88,6 +88,8 @@ module Palapala
     # Method to send a CDP command and wait for a specific method to be called
     def send_command_and_wait_for_event(method, event_name:, params: {})
       send_command(method, params:) do
+        # chrome refuses to load pages that are bigger than 2MB and returns a net::ERR_ABORTED error
+        raise "Page cannot be loaded" if @response.dig("result", "errorText") == "net::ERR_ABORTED"
         @response && @response["method"] == event_name
       end
     end
