@@ -103,7 +103,8 @@ module Palapala
     def html_to_pdf(html, params: {})
       server = start_local_server(html)
       begin
-        url = "http://localhost:#{server[:port]}/"
+        file = File.basename(server[:file].path)
+        url = "http://localhost:#{server[:port]}/#{file}"
         send_command_and_wait_for_event("Page.navigate", params: { url: url },
                                                              event_name: "Page.frameStoppedLoading")
         result = send_command_and_wait_for_result("Page.printToPDF", params:)
