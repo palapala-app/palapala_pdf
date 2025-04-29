@@ -104,7 +104,7 @@ module Palapala
       server = start_local_server(html)
       begin
         file = File.basename(server[:file].path)
-        url = "http://localhost:#{server[:port]}/#{file}"
+        url = "http://localhost:#{server[:port]}/#{URI.encode_www_form_component(file)}"
         send_command_and_wait_for_event("Page.navigate", params: { url: url },
                                                              event_name: "Page.frameStoppedLoading")
         result = send_command_and_wait_for_result("Page.printToPDF", params:)
