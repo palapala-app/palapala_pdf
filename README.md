@@ -241,8 +241,6 @@ thread safe in the sense that every web socket get's a new tab in the underlying
 
 ## Heroku
 
-TODO
-
 This buildpack installs chrome and chromedriver (chromedriver is actually not needed, but at least the buildpack is maintained)
 
 ```sh

@@ -3,6 +3,8 @@ require "net/http"
 require "websocket/driver"
 require_relative "./web_socket_client"
 require_relative "./chrome_process"
+require 'tempfile'
+require 'webrick'
 
 module Palapala
   # Render HTML content to PDF using Chrome in headless mode with minimal dependencies
@@ -99,10 +101,17 @@ module Palapala
     # @param html [String] The HTML content to convert to PDF
     # @param params [Hash] Additional parameters to pass to the CDP command
     def html_to_pdf(html, params: {})
-      send_command_and_wait_for_event("Page.navigate", params: { url: data_url_for_html(html) },
-                                                       event_name: "Page.frameStoppedLoading")
-      result = send_command_and_wait_for_result("Page.printToPDF", params:)
-      Base64.decode64(result["data"])
+      server = start_local_server(html)
+      begin
+        url = "http://localhost:#{server[:port]}/"
+        send_command_and_wait_for_event("Page.navigate", params: { url: url },
+                                                             event_name: "Page.frameStoppedLoading")
+        result = send_command_and_wait_for_result("Page.printToPDF", params:)
+        Base64.decode64(result["data"])
+      ensure
+        server[:thread].kill # Stop the server after use
+        server[:file].unlink # Delete the temporary file
+      end
     end
 
     def ping
@@ -144,6 +153,25 @@ module Palapala
     # Convert the HTML content to a data URL
     def data_url_for_html(html)
       "data:text/html;base64,#{Base64.strict_encode64(html)}"
+    end
+
+    def start_local_server(html)
+      file = Tempfile.new(["html_content", ".html"])
+      file.write(html)
+      file.close
+
+      port = find_available_port
+      server = WEBrick::HTTPServer.new(Port: port, DocumentRoot: File.dirname(file.path), Logger: WEBrick::Log.new("/dev/null"), AccessLog: [])
+      thread = Thread.new { server.start }
+
+      { server: server, thread: thread, file: file, port: port }
+    end
+
+    def find_available_port
+      server = TCPServer.new(0)
+      port = server.addr[1]
+      server.close
+      port
     end
   end
 end
