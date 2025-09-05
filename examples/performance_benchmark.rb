@@ -34,4 +34,9 @@ benchmark(1, 5)
 puts "Starting benchmark..."
 benchmark(1, 10)
 benchmark(2, 20 / 2)
-benchmark(4, 320 / 4)
+puts "Starting benchmark step 2..."
+benchmark(2, 20)
+benchmark(2, 40)
+benchmark(2, 80)
+benchmark(2, 160)
+# benchmark(4, 320 / 4)
