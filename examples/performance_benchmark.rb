@@ -17,7 +17,7 @@ def benchmark(concurrency, iterations)
     threads = (1..concurrency).map do |i|
       Thread.new do
         iterations.times do |j|
-          doc = "Hello #{i}, world #{j}! #{Time.now}."
+          doc = "Hello #{i}, <b>world</b> #{j}! <i>#{Time.now}</i>.<br/><img src='https://www.ruby-lang.org/images/header-ruby-logo.png' />"
           pdf = Palapala::Pdf.new(doc)
           $save ? pdf.save("tmp/benchmark_#{i}_#{j}.pdf") : pdf.binary_data
         end
@@ -38,5 +38,5 @@ puts "Starting benchmark step 2..."
 benchmark(2, 20)
 benchmark(2, 40)
 benchmark(2, 80)
-benchmark(2, 160)
+benchmark(4, 160)
 # benchmark(4, 320 / 4)
