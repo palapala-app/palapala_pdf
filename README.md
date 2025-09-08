@@ -278,3 +278,7 @@ Ensure the script is executable
 ```sh
 chmod +x bin/start
 ```
+
+# REFERENCES
+
+Info to process : https://nathanfriend.com/2019/04/15/pdf-gotchas-with-headless-chrome.html

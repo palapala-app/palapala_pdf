@@ -1,6 +1,9 @@
 require_relative "palapala/pdf"
 require_relative "palapala/helper"
+require_relative "palapala/asset_helper"
 require_relative "palapala/version"
+require_relative "palapala/railtie"
+require_relative "palapala/html_preprocessor"
 
 module Palapala
   def self.setup
@@ -34,7 +37,7 @@ module Palapala
   self.chrome_headless_shell_version = ENV.fetch("CHROME_HEADLESS_SHELL_VERSION", "stable")
   self.chrome_params = ENV.fetch("HEADLESS_CHROME_PARAMS", nil)&.split || []
 
-  if !ENV["DYNO"].nil? || File.exist?('/.dockerenv')
+  if !ENV["DYNO"].nil? || File.exist?("/.dockerenv")
     self.chrome_params ||= []
     self.chrome_params << "--no-sandbox"
   end
