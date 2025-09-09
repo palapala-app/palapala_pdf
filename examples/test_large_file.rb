@@ -7,7 +7,7 @@ require 'benchmark'
 require 'palapala'
 
 # Enable debug logging
-Palapala.debug = false
+Palapala.debug = true
 
 puts "Testing large file processing..."
 
@@ -15,6 +15,7 @@ puts "Testing large file processing..."
 doc = "Hello, world! <i>#{Time.now}</i>. 00001: 0123456789 The quick brown fox jumps over the lazy dog.\n"
 # make doc double the size untiul it's bigger than html_size
 doc *= (2_000_000 / doc.bytesize) + 1
+# doc *= (10_000 / doc.bytesize) + 1
 large_html = "<html><body><pre>#{doc}</pre></body></html>"
 
 # save the generated file as large_file.html
