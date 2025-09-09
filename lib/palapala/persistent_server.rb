@@ -17,6 +17,7 @@ module Palapala
     end
 
     def initialize(port: 9223)
+      puts "initializing persistent server" if defined?(Palapala) && Palapala.debug
       @port = find_available_port(port)
       @server = WEBrick::HTTPServer.new(
         Port: @port,
@@ -44,7 +45,8 @@ module Palapala
       @thread = Thread.new { @server.start }
 
       # Wait for server to be ready
-      sleep 0.1 until @server.status == :Running
+      sleep 0.05 until @server.status == :Running
+      puts "initializing persistent server: DONE" if defined?(Palapala) && Palapala.debug
     end
 
     # Serve HTML content and return URL
