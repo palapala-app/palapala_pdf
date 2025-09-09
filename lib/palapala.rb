@@ -2,8 +2,15 @@ require_relative "palapala/pdf"
 require_relative "palapala/helper"
 require_relative "palapala/asset_helper"
 require_relative "palapala/version"
-require_relative "palapala/railtie"
 require_relative "palapala/html_preprocessor"
+
+# Only load railtie if Rails is present
+begin
+  require "rails"
+  require_relative "palapala/railtie"
+rescue LoadError
+  # Rails not available, skip railtie
+end
 
 module Palapala
   def self.setup
