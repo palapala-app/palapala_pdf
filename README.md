@@ -40,6 +40,8 @@ bundle add palapala_pdf
 
 ## Usage Instructions
 
+The gem can be used in Rails context as wel as in plain Ruby context.
+
 **Create a PDF from HTML**
 
 Load palapala and create a PDF file from an HTML snippet:

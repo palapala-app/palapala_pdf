@@ -5,11 +5,7 @@ class PdfsController < ApplicationController
   def show
     respond_to do |format|
       format.html
-      format.pdf {
-        render pdf: {},
-        disposition: :inline,
-        filename: "example.pdf"
-      }
+      format.pdf { render pdf: {}, disposition: :inline, filename: "example.pdf" }
     end
   end
 
