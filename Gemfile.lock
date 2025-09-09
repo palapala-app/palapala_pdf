@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    palapala_pdf (0.1.25)
+    palapala_pdf (0.1.26)
       base64 (~> 0)
       combine_pdf (~> 1)
       rails (>= 6.0.0)
@@ -120,6 +120,7 @@ GEM
     marcel (1.0.4)
     matrix (0.4.2)
     mini_mime (1.1.5)
+    mini_portile2 (2.8.9)
     minitest (5.25.4)
     net-imap (0.5.10)
       date
@@ -131,6 +132,9 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.4)
+    nokogiri (1.18.9)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.18.9-arm64-darwin)
       racc (~> 1.4)
     parallel (1.26.3)

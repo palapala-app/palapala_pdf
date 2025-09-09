@@ -3,6 +3,7 @@ require "net/http"
 require "websocket/driver"
 require_relative "./web_socket_client"
 require_relative "./chrome_process"
+require_relative "./persistent_server"
 require 'tempfile'
 require 'webrick'
 
@@ -44,7 +45,7 @@ module Palapala
 
     # Callback to handle the incomming WebSocket messages
     def on_message(e)
-      puts "Received: #{e.data[0..64]}" if Palapala.debug
+      puts "Received: #{e.data[0..128]}" if Palapala.debug
       @response = JSON.parse(e.data) # Parse the JSON response
       if @response["error"] # Raise an error if the response contains an error
         raise "#{@response["error"]["message"]}: #{@response["error"]["data"]} (#{@response["error"]["code"]})"
@@ -60,15 +61,20 @@ module Palapala
     # Process the WebSocket messages until some state is true
     def process_until(&block)
       loop do
-        @driver.parse(@client.read)
-        return if block.call
-        return if @driver.state == :closed
+        begin
+          @driver.parse(@client.read)
+          return if block.call
+          return if @driver.state == :closed
+        rescue EOFError => e
+          puts "WebSocket connection lost: #{e.message}" if Palapala.debug
+          raise "Chrome process appears to have died. WebSocket connection lost."
+        end
       end
     end
 
     # Method to send a message (text) and wait for a response
     def send_and_wait(message, &)
-      puts "\nSending: #{message}" if Palapala.debug
+      puts "\nSending: #{message.to_s[0..128]}" if Palapala.debug
       @driver.text(message)
       process_until(&)
     end
@@ -81,19 +87,52 @@ module Palapala
     # Method to send a CDP command and wait for the matching event to get the result
     # @return [Hash] The result of the command
     def send_command_and_wait_for_result(method, params: {})
+      puts "Waiting for result of #{method}..." if Palapala.debug
       send_command(method, params:) do
         @response && @response["id"] == current_id
       end
+      puts "Got result for #{method}" if Palapala.debug
       @response["result"]
+    end
+
+    # Method to send a CDP command and wait for the result with timeout
+    # @return [Hash] The result of the command
+    def send_command_and_wait_for_result_with_timeout(method, params: {}, timeout: 300)
+      puts "Waiting for result of #{method} (timeout: #{timeout}s)..." if Palapala.debug
+
+      result = nil
+      error = nil
+
+      thread = Thread.new do
+        begin
+          send_command(method, params:) do
+            @response && @response["id"] == current_id
+          end
+          result = @response["result"]
+        rescue => e
+          error = e
+        end
+      end
+
+      unless thread.join(timeout)
+        thread.kill
+        raise "Timeout: #{method} took longer than #{timeout} seconds"
+      end
+
+      raise error if error
+      puts "Got result for #{method}" if Palapala.debug
+      result
     end
 
     # Method to send a CDP command and wait for a specific method to be called
     def send_command_and_wait_for_event(method, event_name:, params: {})
+      puts "Waiting for event #{event_name} from #{method}..." if Palapala.debug
       send_command(method, params:) do
         # chrome refuses to load pages that are bigger than 2MB and returns a net::ERR_ABORTED error
         raise "Page cannot be loaded" if @response.dig("result", "errorText") == "net::ERR_ABORTED"
         @response && @response["method"] == event_name
       end
+      puts "Got event #{event_name}" if Palapala.debug
     end
 
     # Convert HTML content to PDF
@@ -101,17 +140,35 @@ module Palapala
     # @param html [String] The HTML content to convert to PDF
     # @param params [Hash] Additional parameters to pass to the CDP command
     def html_to_pdf(html, params: {})
-      server = start_local_server(html)
+      puts "Starting PDF generation for #{html.bytesize} bytes" if Palapala.debug
+
+      # Use data URL for small content (< 2MB after base64 encoding), persistent server for larger content
+      # Base64 encoding increases size by ~33%, so check original size < 1.2MB to be safe
+      if html.bytesize < 1_200_000
+        puts "Using data URL for small content" if Palapala.debug
+        url = data_url_for_html(html)
+        cleanup_key = nil
+      else
+        puts "Using persistent server for large content" if Palapala.debug
+        server = PersistentServer.instance
+        url = server.serve_html(html)
+        cleanup_key = url.split('/').last
+        puts "Served content at URL: #{url}" if Palapala.debug
+      end
+
       begin
-        file = File.basename(server[:file].path)
-        url = "http://localhost:#{server[:port]}/#{URI.encode_www_form_component(file)}"
-        send_command_and_wait_for_event("Page.navigate", params: { url: url },
-                                                             event_name: "Page.frameStoppedLoading")
-        result = send_command_and_wait_for_result("Page.printToPDF", params:)
+        puts "Navigating to URL..." if Palapala.debug
+      send_command_and_wait_for_event("Page.navigate", params: { url: url }, event_name: "Page.frameStoppedLoading")
+        puts "Page loaded, generating PDF..." if Palapala.debug
+        result = send_command_and_wait_for_result_with_timeout("Page.printToPDF", params:)
+        puts "PDF generated, decoding..." if Palapala.debug
         Base64.decode64(result["data"])
       ensure
-        server[:thread].kill # Stop the server after use
-        server[:file].unlink # Delete the temporary file
+        # Clean up served content if using persistent server
+        if cleanup_key
+          puts "Cleaning up content key: #{cleanup_key}" if Palapala.debug
+          PersistentServer.instance.cleanup(cleanup_key)
+        end
       end
     end
 
@@ -122,7 +179,8 @@ module Palapala
 
     def self.html_to_pdf(html, params: {})
       thread_local_instance.html_to_pdf(html, params: params)
-    rescue StandardError
+    rescue StandardError => e
+      puts "PDF generation failed: #{e.message}" if Palapala.debug
       reset # Reset the renderer on error, the websocket connection might be broken
       thread_local_instance.html_to_pdf(html, params: params) # Retry (once)
     end
@@ -143,18 +201,25 @@ module Palapala
       request = Net::HTTP::Put.new(uri)
       request["Content-Type"] = "application/json"
       response = http.request(request)
-      tab_info = JSON.parse(response.body)
-      websocket_url = tab_info["webSocketDebuggerUrl"]
-      puts "WebSocket URL: #{websocket_url}" if Palapala.debug
-      websocket_url
-    end
 
-    private
+      # Check if response is valid JSON
+      begin
+        tab_info = JSON.parse(response.body)
+        websocket_url = tab_info["webSocketDebuggerUrl"]
+        puts "WebSocket URL: #{websocket_url}" if Palapala.debug
+        websocket_url
+      rescue JSON::ParserError => e
+        puts "Chrome response error: #{response.body}" if Palapala.debug
+        raise "Chrome is not responding properly. Response: #{response.body}"
+      end
+    end
 
     # Convert the HTML content to a data URL
     def data_url_for_html(html)
       "data:text/html;base64,#{Base64.strict_encode64(html)}"
     end
+
+    private
 
     def start_local_server(html)
       file = Tempfile.new(["html_content", ".html"])
