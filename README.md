@@ -246,6 +246,15 @@ $CHROME_PATH --disable-gpu --remote-debugging-port=9222 --disable-software-raste
 
 *It has also been reported that the Chrome process repeatedly crashes when running inside a Docker container on an M1 Mac. Chrome should work asexpected when deployed to a Docker container on a non-M1 Mac.*
 
+The gem comes with an executable `chrome-headless-server` that installs chrome headless (using npx) and runs it, so once the gem is installed you can simple do this
+
+```
+> chrome-headless-server
+Installing/launching chrome-headless-shell@stable
+Launching chrome-headless-shell at chrome-headless-shell/mac_arm-140.0.7339.80/chrome-headless-shell-mac-arm64/chrome-headless-shell
+Google Chrome for Testing 140.0.7339.80
+DevTools listening on ws://127.0.0.1:9222/devtools/browser/e2565da0-8bf0-45f0-9cfc-86211db70a99
+```
 
 ## Thread-safety
 
