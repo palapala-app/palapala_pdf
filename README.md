@@ -40,7 +40,37 @@ bundle add palapala_pdf
 
 ## Usage Instructions
 
+**Create a PDF from HTML**
+
+Load palapala and create a PDF file from an HTML snippet:
+
+```ruby
+require "palapala"
+Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").save('hello.pdf')
+```
+
+Instantiate a new Palapala::Pdf object with your HTML content and generate the PDF binary data:
+
+```ruby
+require "palapala"
+binary_data = Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").binary_data
+```
+
 To create a PDF from HTML content using the `Palapala` library, follow these steps:
+
+**Render PDFs from Rails controllers**
+
+Use the `pdf` renderer in Rails controllers to render a PDF from the current action.
+Inspired by Chris Oliver's code shared at RailsWorld2025.
+
+```ruby
+  def show
+    respond_to do |format|
+      format.html
+      format.pdf { render pdf: {}, disposition: :inline, filename: "example.pdf" }
+    end
+  end
+```
 
 **Configuration from inside Ruby**
 
@@ -77,22 +107,6 @@ HEADLESS_CHROME_URL=http://192.168.1.1:9222 ruby examples/performance_benchmark.
 
 ```sh
 HEADLESS_CHROME_PATH=/var/to/chrome ruby examples/performance_benchmark.rb
-```
-
-**Create a PDF from HTML**
-
-Load palapala and create a PDF file from an HTML snippet:
-
-```ruby
-require "palapala"
-Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").save('hello.pdf')
-```
-
-Instantiate a new Palapala::Pdf object with your HTML content and generate the PDF binary data:
-
-```ruby
-require "palapala"
-binary_data = Palapala::Pdf.new("<h1>Hello, world! #{Time.now}</h1>").binary_data
 ```
 
 ## Advanced Examples
