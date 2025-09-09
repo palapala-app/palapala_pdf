@@ -38,8 +38,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "websocket-driver", "~> 0"
   spec.add_dependency "combine_pdf", "~> 1"
   spec.add_dependency "webrick", "~> 1", ">= 1.7.0"
-  # Rails is optional - only needed for asset helpers and railtie functionality
-  # spec.add_dependency "rails", ">= 6.0"
   spec.add_dependency "uri", "~> 1.0", ">= 1.0.3"
-  # Rack is optional - only needed when Rails is present
-  # spec.add_dependency "rack", "~> 2.0"
+
+  # For more information and examples about making a new gem, check out our
+  # guide at: https://bundler.io/guides/creating_gem.html
+end
