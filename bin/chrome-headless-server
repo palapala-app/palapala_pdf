@@ -7,5 +7,5 @@ Palapala.setup do |config|
   config.debug = true
 end
 
-pid = Palapala::ChromeProcess.spawn_chrome_headless_server
+pid = Palapala::ChromeProcess.spawn_chrome_headless_server_with_npx
 Process.wait(pid)
