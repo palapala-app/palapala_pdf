@@ -4,6 +4,28 @@ require "pathname"
 module Palapala
   # Manage the Chrome child process
   module ChromeProcess
+    # Detect if we're running in a CI/CD environment
+    def self.ci_environment?
+      # Common CI environment variables
+      ENV["CI"] == "true" ||
+      ENV["GITHUB_ACTIONS"] == "true" ||
+        # ENV["GITLAB_CI"] == "true" ||
+        # ENV["JENKINS_URL"] ||
+        # ENV["BUILDKITE"] == "true" ||
+        # ENV["CIRCLECI"] == "true" ||
+        # ENV["TRAVIS"] == "true" ||
+        # ENV["APPVEYOR"] == "true" ||
+        # ENV["DRONE"] == "true" ||
+        # ENV["SEMAPHORE"] == "true" ||
+        # ENV["CODESHIP"] == "true" ||
+        # ENV["WERCKER"] == "true" ||
+        # ENV["BAMBOO_BUILDKEY"] ||
+        # ENV["TEAMCITY_VERSION"] ||
+        # ENV["TF_BUILD"] == "True" ||
+        # ENV["VERCEL"] == "1" ||
+        # ENV["NETLIFY"] == "true" ||
+      ENV["HEROKU_TEST_RUN_ID"]
+    end
     # Check if the port is in use
     def self.port_in_use?(port = 9222, host = "127.0.0.1")
       server = TCPServer.new(host, port)
@@ -82,13 +104,15 @@ module Palapala
         # Display the version
         system("#{chrome_path} --version") if Palapala.debug
         # Launch chrome-headless-shell with the --remote-debugging-port parameter
-        params = [ "--disable-gpu", "--disable-software-rasterizer", "--disable-bluetooth", "--disable-dev-shm-usage", "--remote-debugging-port=9222", "--remote-debugging-address=0.0.0.0" ]
+        params = ["--disable-gpu", "--disable-software-rasterizer", "--disable-bluetooth", "--disable-dev-shm-usage", "--remote-debugging-port=9222", "--remote-debugging-address=0.0.0.0"]
+        # Add --no-sandbox only in CI environments where sandbox is not available
+        params.unshift("--no-sandbox") if ci_environment?
         params.concat(Palapala.chrome_params) if Palapala.chrome_params
         pid = if Palapala.debug
-          spawn(chrome_path, *params)
-        else
-          spawn(chrome_path, *params, out: "/dev/null", err: "/dev/null")
-        end
+            spawn(chrome_path, *params)
+          else
+            spawn(chrome_path, *params, out: "/dev/null", err: "/dev/null")
+          end
         Palapala.headless_chrome_url = "http://localhost:9222"
         pid
       else
@@ -97,7 +121,9 @@ module Palapala
     end
 
     def self.spawn_chrome_from_path
-      params = [ "--headless", "--disable-gpu", "--disable-software-rasterizer", "--disable-bluetooth", "--disable-dev-shm-usage", "--remote-debugging-port=9222", "--remote-debugging-address=0.0.0.0"  ]
+      params = ["--headless", "--disable-gpu", "--disable-software-rasterizer", "--disable-bluetooth", "--disable-dev-shm-usage", "--remote-debugging-port=9222", "--remote-debugging-address=0.0.0.0"]
+      # Add --no-sandbox only in CI environments where sandbox is not available
+      params.unshift("--no-sandbox") if ci_environment?
       params.concat(Palapala.chrome_params) if Palapala.chrome_params
       # Spawn an existing chrome with the path and parameters
       Process.spawn(chrome_path, *params)
@@ -107,8 +133,7 @@ module Palapala
     def self.spawn_chrome
       return if chrome_running?
 
-      @chrome_process_id =
-        if Palapala.headless_chrome_path.nil? && self.npx_installed?
+      @chrome_process_id = if Palapala.headless_chrome_path.nil? && self.npx_installed?
           spawn_chrome_headless_server_with_npx
         else
           spawn_chrome_from_path
