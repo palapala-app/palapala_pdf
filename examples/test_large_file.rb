@@ -1,11 +1,13 @@
 #!/usr/bin/env ruby
 # Test script to debug large file processing
 
-$LOAD_PATH.unshift File.expand_path('./lib', __dir__)
-require 'palapala_pdf'
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+
+require 'benchmark'
+require 'palapala'
 
 # Enable debug logging
-Palapala.debug = true
+Palapala.debug = false
 
 puts "Testing large file processing..."
 
@@ -16,7 +18,7 @@ doc *= (2_000_000 / doc.bytesize) + 1
 large_html = "<html><body><pre>#{doc}</pre></body></html>"
 
 # save the generated file as large_file.html
-File.write("large_file.html", large_html)
+# File.write("large_file.html", large_html)
 
 puts "Generated HTML: #{large_html.bytesize} bytes"
 
