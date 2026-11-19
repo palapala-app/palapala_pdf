@@ -37,14 +37,7 @@ module Palapala
 
     # Check if the Chrome process is healthy
     def self.chrome_process_healthy?
-      return false if @chrome_process_id.nil?
-
-      begin
-        Process.kill(0, @chrome_process_id) # Check if the process is alive
-        true
-      rescue Errno::ESRCH, Errno::EPERM
-        false
-      end
+      @chrome_waiter&.alive? || false
     end
 
     # Check if a Chrome is running locally
@@ -55,10 +48,11 @@ module Palapala
 
     # Kill the Chrome child process
     def self.kill_chrome
-      return if @chrome_process_id.nil?
+      waiter = @chrome_waiter
+      return unless waiter&.alive?
 
-      Process.kill("KILL", @chrome_process_id) # Kill the process
-      Process.wait(@chrome_process_id) # Wait for the process to finish
+      Process.kill("KILL", waiter.pid)
+      waiter.join.pid
     end
 
     # Get the path to the Chrome executable, if it's not set, then guess based on the OS
@@ -133,42 +127,28 @@ module Palapala
     def self.spawn_chrome
       return if chrome_running?
 
-      @chrome_process_id = if Palapala.headless_chrome_path.nil? && self.npx_installed?
+      pid =
+        if Palapala.headless_chrome_path.nil? && self.npx_installed?
           spawn_chrome_headless_server_with_npx
         else
           spawn_chrome_from_path
         end
 
+      # Wait for Chrome by PID and leave other child processes to their callers.
+      waiter = Process.detach(pid)
+      @chrome_waiter = waiter
+
       # Wait until the port is in use
       sleep 0.1 until port_in_use?
-      # Detach the process so it runs in the background
-      Process.detach(@chrome_process_id)
 
       at_exit do
-        if @chrome_process_id
-          begin
-            Process.kill("TERM", @chrome_process_id)
-            Process.wait(@chrome_process_id)
-            puts "Child process #{@chrome_process_id} terminated."
-          rescue Errno::ESRCH
-            puts "Child process #{@chrome_process_id} is already terminated."
-          rescue Errno::ECHILD
-            puts "No child process #{@chrome_process_id} found."
-          end
-        end
-      end
+        next unless waiter.alive?
 
-      # Handle when the process is killed
-      trap("SIGCHLD") do
-        while (@chrome_process_id = Process.wait(-1, Process::WNOHANG))
-          break if @chrome_process_id.nil?
-
-          puts "Process #{@chrome_process_id} was killed."
-          # Handle the error or restart the process if necessary
-          @chrome_process_id = nil
-        end
-      rescue Errno::ECHILD
-        @chrome_process_id = nil
+        Process.kill("TERM", pid)
+        waiter.join
+        puts "Child process #{pid} terminated."
+      rescue Errno::ESRCH
+        puts "Child process #{pid} is already terminated."
       end
     end
   end
