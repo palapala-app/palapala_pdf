@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+#
+# Release palapala_pdf: bump, verify, tag, publish.
+#
+# Usage:
+#   bin/release                 # bump patch (0.1.28 -> 0.1.29)
+#   bin/release minor           # bump minor (0.1.28 -> 0.2.0)
+#   bin/release major           # bump major (0.1.28 -> 1.0.0)
+#   bin/release 0.3.1           # set an explicit version
+#
+#   bin/release --dry-run       # do everything except push/publish
+#
+# The RubyGems API key comes from the usual gem credentials file. Only the
+# MFA one-time code is fetched from 1Password, via $OP_RUBYGEMS_ITEM.
+set -euo pipefail
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+VERSION_FILE="lib/palapala/version.rb"
+GEMSPEC="palapala_pdf.gemspec"
+OP_RUBYGEMS_ITEM="${OP_RUBYGEMS_ITEM:-RubyGems}"
+
+DRY_RUN=0
+BUMP="patch"
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run)              DRY_RUN=1 ;;
+    major|minor|patch)      BUMP="$arg" ;;
+    [0-9]*.[0-9]*.[0-9]*)   BUMP="$arg" ;;
+    *) echo "unknown argument: $arg" >&2; exit 2 ;;
+  esac
+done
+
+step() { printf '\n\033[1;34m==>\033[0m \033[1m%s\033[0m\n' "$1"; }
+die()  { printf '\n\033[1;31mx\033[0m %s\n' "$1" >&2; exit 1; }
+
+# --- preflight -------------------------------------------------------------
+
+step "Preflight"
+
+[ -n "$(git status --porcelain)" ] && die "Working tree is dirty. Commit or stash first."
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+[ "$branch" = "main" ] || die "On branch '$branch'. Releases are cut from main."
+
+git fetch --quiet origin
+local_sha="$(git rev-parse @)"
+remote_sha="$(git rev-parse @{u})"
+base_sha="$(git merge-base @ @{u})"
+if [ "$local_sha" != "$remote_sha" ]; then
+  [ "$local_sha" = "$base_sha" ] && die "Behind origin/main. Run: git pull --rebase"
+  [ "$remote_sha" = "$base_sha" ] && die "Ahead of origin/main with unpushed commits. Push them first."
+  die "Diverged from origin/main."
+fi
+
+command -v op >/dev/null || die "1Password CLI (op) not found."
+op item get "$OP_RUBYGEMS_ITEM" --fields label=username >/dev/null 2>&1 \
+  || die "1Password item '$OP_RUBYGEMS_ITEM' not found. Set OP_RUBYGEMS_ITEM, or create it (see bin/release header)."
+
+# Fail now, not after tagging, if the item has no TOTP configured.
+op item get "$OP_RUBYGEMS_ITEM" --otp >/dev/null 2>&1 \
+  || die "1Password item '$OP_RUBYGEMS_ITEM' has no one-time password field."
+
+echo "  branch=main, in sync with origin, 1Password item '$OP_RUBYGEMS_ITEM' OK"
+
+# --- version ---------------------------------------------------------------
+
+step "Version"
+
+current="$(ruby -r./lib/palapala/version -e 'print Palapala::VERSION')"
+
+if [[ "$BUMP" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  next="$BUMP"
+else
+  IFS=. read -r maj min pat <<<"$current"
+  case "$BUMP" in
+    major) next="$((maj + 1)).0.0" ;;
+    minor) next="${maj}.$((min + 1)).0" ;;
+    patch) next="${maj}.${min}.$((pat + 1))" ;;
+  esac
+fi
+
+[ "$current" = "$next" ] && die "Version is already $next."
+git rev-parse -q --verify "refs/tags/v$next" >/dev/null && die "Tag v$next already exists."
+
+# Guard against reusing a version that is already on RubyGems.
+if gem list -r -a palapala_pdf 2>/dev/null | grep -qE "(^| )$next(,|\)| )"; then
+  die "Version $next is already published on RubyGems."
+fi
+
+echo "  $current -> $next"
+
+sed -i '' -E "s/VERSION = \"${current}\"/VERSION = \"${next}\"/" "$VERSION_FILE"
+grep -q "VERSION = \"$next\"" "$VERSION_FILE" || die "Failed to update $VERSION_FILE."
+
+# Roll the version change back if anything below this point fails.
+cleanup() {
+  if [ "${RELEASED:-0}" != "1" ]; then
+    printf '\n\033[1;33m!\033[0m Rolling back uncommitted version bump\n' >&2
+    git checkout -- "$VERSION_FILE" Gemfile.lock 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
+
+# --- verify ----------------------------------------------------------------
+
+step "Install + test"
+
+bundle install --quiet
+bundle exec rake test
+
+step "Build"
+
+rm -f "palapala_pdf-${next}.gem"
+gem build "$GEMSPEC"
+[ -f "palapala_pdf-${next}.gem" ] || die "Expected palapala_pdf-${next}.gem was not produced."
+
+# --- commit, tag, publish --------------------------------------------------
+
+if [ "$DRY_RUN" = "1" ]; then
+  step "Dry run - stopping before commit/tag/publish"
+  echo "  built: palapala_pdf-${next}.gem"
+  echo "  would commit, tag v${next}, push, and publish to RubyGems"
+  exit 0
+fi
+
+step "Commit + tag"
+
+git add "$VERSION_FILE" Gemfile.lock
+git commit -m "Bump version to ${next}"
+git tag -a "v${next}" -m "Release v${next}"
+RELEASED=1
+
+step "Push"
+
+git push origin main
+git push origin "v${next}"
+
+step "Publish to RubyGems"
+
+# --otp keeps the code off the process list of any other command.
+gem push "palapala_pdf-${next}.gem" --otp "$(op item get "$OP_RUBYGEMS_ITEM" --otp)"
+
+step "Released palapala_pdf ${next}"
+echo "  https://rubygems.org/gems/palapala_pdf/versions/${next}"
