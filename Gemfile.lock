@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    palapala_pdf (0.1.27)
+    palapala_pdf (0.1.28)
       base64 (~> 0)
       combine_pdf (~> 1)
       uri (~> 1.0, >= 1.0.3)
