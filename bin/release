@@ -54,8 +54,8 @@ if [ "$local_sha" != "$remote_sha" ]; then
 fi
 
 command -v op >/dev/null || die "1Password CLI (op) not found."
-op item get "$OP_RUBYGEMS_ITEM" --fields label=username >/dev/null 2>&1 \
-  || die "1Password item '$OP_RUBYGEMS_ITEM' not found. Set OP_RUBYGEMS_ITEM, or create it (see bin/release header)."
+op item get "$OP_RUBYGEMS_ITEM" >/dev/null 2>&1 \
+  || die "1Password item '$OP_RUBYGEMS_ITEM' not found (or op is not signed in). Set OP_RUBYGEMS_ITEM, or create it (see bin/release header)."
 
 # Fail now, not after tagging, if the item has no TOTP configured.
 op item get "$OP_RUBYGEMS_ITEM" --otp >/dev/null 2>&1 \
