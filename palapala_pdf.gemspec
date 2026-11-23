@@ -35,7 +35,7 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "base64", "~> 0"
-  spec.add_dependency "websocket-driver", "~> 0"
+  spec.add_dependency "websocket-driver", "~> 0", ">= 0.8.2"
   spec.add_dependency "combine_pdf", "~> 1"
   spec.add_dependency "webrick", "~> 1", ">= 1.7.0"
   spec.add_dependency "uri", "~> 1.0", ">= 1.0.3"
