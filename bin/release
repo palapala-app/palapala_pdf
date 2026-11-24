@@ -20,9 +20,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 VERSION_FILE="lib/palapala/version.rb"
 GEMSPEC="palapala_pdf.gemspec"
 
-# Referenced by ID, not title: two items share the title
-# "rubygems.org (koen@handekyn.com)", so a title lookup is ambiguous.
-OP_RUBYGEMS_ITEM="${OP_RUBYGEMS_ITEM:-3hl2jhomv5bs4ziiqroqmiahn4}"
+OP_RUBYGEMS_ITEM="${OP_RUBYGEMS_ITEM:-rubygems.org (koen@handekyn.com)}"
 OP_RUBYGEMS_VAULT="${OP_RUBYGEMS_VAULT:-Employee}"
 
 DRY_RUN=0
@@ -69,8 +67,15 @@ if [ "$local_sha" != "$remote_sha" ]; then
 fi
 
 command -v op >/dev/null || die "1Password CLI (op) not found."
-op_rubygems >/dev/null \
-  || die "1Password item '$OP_RUBYGEMS_ITEM' not readable in vault '$OP_RUBYGEMS_VAULT'. Check op is signed in, or override OP_RUBYGEMS_ITEM / OP_RUBYGEMS_VAULT."
+if ! op_rubygems >/dev/null; then
+  printf '\n\033[1;31mx\033[0m 1Password lookup failed for "%s" in vault "%s":\n\n' \
+    "$OP_RUBYGEMS_ITEM" "$OP_RUBYGEMS_VAULT" >&2
+  # Surface op's own diagnosis -- usually "isn't an item", "More than one item
+  # matches" (duplicate titles), or a sign-in prompt.
+  env -u OP_SERVICE_ACCOUNT_TOKEN \
+    op item get "$OP_RUBYGEMS_ITEM" --vault "$OP_RUBYGEMS_VAULT" >/dev/null || true
+  die "Set OP_RUBYGEMS_ITEM (title or item ID) and/or OP_RUBYGEMS_VAULT."
+fi
 
 # Fail now, not after tagging, if the item has no TOTP configured.
 op_rubygems --otp >/dev/null \
