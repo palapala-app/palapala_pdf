@@ -10,15 +10,20 @@
 #
 #   bin/release --dry-run       # do everything except push/publish
 #
-# The RubyGems API key comes from the usual gem credentials file. Only the
-# MFA one-time code is fetched from 1Password, via $OP_RUBYGEMS_ITEM.
+# The RubyGems API key comes from the usual gem credentials file. Only the MFA
+# one-time code is fetched from 1Password, from $OP_RUBYGEMS_ITEM in
+# $OP_RUBYGEMS_VAULT (both overridable by environment variable).
 set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 VERSION_FILE="lib/palapala/version.rb"
 GEMSPEC="palapala_pdf.gemspec"
-OP_RUBYGEMS_ITEM="${OP_RUBYGEMS_ITEM:-RubyGems}"
+
+# Referenced by ID, not title: two items share the title
+# "rubygems.org (koen@handekyn.com)", so a title lookup is ambiguous.
+OP_RUBYGEMS_ITEM="${OP_RUBYGEMS_ITEM:-3hl2jhomv5bs4ziiqroqmiahn4}"
+OP_RUBYGEMS_VAULT="${OP_RUBYGEMS_VAULT:-Employee}"
 
 DRY_RUN=0
 BUMP="patch"
@@ -33,6 +38,16 @@ done
 
 step() { printf '\n\033[1;34m==>\033[0m \033[1m%s\033[0m\n' "$1"; }
 die()  { printf '\n\033[1;31mx\033[0m %s\n' "$1" >&2; exit 1; }
+
+# If OP_SERVICE_ACCOUNT_TOKEN is exported, op uses that identity and ignores the
+# desktop-app session. Service accounts only reach the vaults they are granted,
+# which on this machine is 'Local' -- not the vault holding the RubyGems item.
+# Try the ambient identity first, then retry as the signed-in user.
+op_rubygems() {
+  op item get "$OP_RUBYGEMS_ITEM" --vault "$OP_RUBYGEMS_VAULT" "$@" 2>/dev/null \
+    || env -u OP_SERVICE_ACCOUNT_TOKEN \
+         op item get "$OP_RUBYGEMS_ITEM" --vault "$OP_RUBYGEMS_VAULT" "$@" 2>/dev/null
+}
 
 # --- preflight -------------------------------------------------------------
 
@@ -54,14 +69,14 @@ if [ "$local_sha" != "$remote_sha" ]; then
 fi
 
 command -v op >/dev/null || die "1Password CLI (op) not found."
-op item get "$OP_RUBYGEMS_ITEM" >/dev/null 2>&1 \
-  || die "1Password item '$OP_RUBYGEMS_ITEM' not found (or op is not signed in). Set OP_RUBYGEMS_ITEM, or create it (see bin/release header)."
+op_rubygems >/dev/null \
+  || die "1Password item '$OP_RUBYGEMS_ITEM' not readable in vault '$OP_RUBYGEMS_VAULT'. Check op is signed in, or override OP_RUBYGEMS_ITEM / OP_RUBYGEMS_VAULT."
 
 # Fail now, not after tagging, if the item has no TOTP configured.
-op item get "$OP_RUBYGEMS_ITEM" --otp >/dev/null 2>&1 \
+op_rubygems --otp >/dev/null \
   || die "1Password item '$OP_RUBYGEMS_ITEM' has no one-time password field."
 
-echo "  branch=main, in sync with origin, 1Password item '$OP_RUBYGEMS_ITEM' OK"
+echo "  branch=main, in sync with origin, 1Password OTP reachable"
 
 # --- version ---------------------------------------------------------------
 
@@ -138,8 +153,7 @@ git push origin "v${next}"
 
 step "Publish to RubyGems"
 
-# --otp keeps the code off the process list of any other command.
-gem push "palapala_pdf-${next}.gem" --otp "$(op item get "$OP_RUBYGEMS_ITEM" --otp)"
+gem push "palapala_pdf-${next}.gem" --otp "$(op_rubygems --otp)"
 
 step "Released palapala_pdf ${next}"
 echo "  https://rubygems.org/gems/palapala_pdf/versions/${next}"
